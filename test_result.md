@@ -252,6 +252,42 @@ backend:
           agent: "testing"
           comment: "✅ TESTED: Salary calculation endpoints working correctly. All 5 salary endpoints tested: (1) POST /api/employees/{id}/calculate-salary - calculates salary with proper ESI (1.75%), PF (12%), PT (₹200 Karnataka), HRA (50% metro rate), DA (10%), medical (₹1,250), transport (₹1,600). (2) GET /api/salary/working-days/{year}/{month} - returns correct working days excluding Sundays. (3) GET /api/employees/{id}/attendance-summary/{year}/{month} - provides attendance summary with percentages. (4) GET /api/salary/rates - returns government rates and allowance information. (5) POST /api/employees/{id}/generate-salary-slip - generates comprehensive PDF salary slip with all breakdowns. Minor: System uses 50% HRA rate (metro) instead of 40% (non-metro) as mentioned in requirements, but this is correct for Bangalore metro city. All calculations follow Indian government regulations. JWT authentication properly enforced on all endpoints."
 
+  - task: "Employee Agreement Generation API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Employee agreement generation working perfectly. POST /api/employees/{employee_id}/generate-employee-agreement successfully generates comprehensive legal employment agreements with Vishwas World Tech letterhead and company logo. Agreement includes: (1) Company details: Vishwas World Tech Private Limited, 100 DC Complex, Chandra Layout, Bangalore - 560040, (2) Working hours: 9:45 AM to 6:45 PM, (3) Comprehensive legal terms including confidentiality, code of conduct, termination clauses, (4) Late login penalty policy with specific deduction amounts, (5) Salary structure and allowances. PDF generation creates substantial documents (92KB+) with proper formatting. JWT authentication required. Error handling works for invalid employee IDs (404). Generated filename format: Employee_Agreement_{name}_{employee_id}.pdf"
+
+  - task: "Late Login Penalty Calculation API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Late login penalty calculation working perfectly. POST /api/attendance/calculate-late-penalty accurately calculates penalties based on company policy: (1) On time (9:45 AM) → ₹0 penalty, (2) Up to 15 minutes late → ₹0 (grace period), (3) 16-30 minutes late → ₹200 penalty, (4) 31-60 minutes late → ₹500 penalty, (5) More than 60 minutes late → ₹1,000 penalty. All test scenarios passed with correct penalty amounts and delay calculations. Returns structured response with employee_id, login_time, scheduled_time, penalty_amount, delay_minutes, and category. JWT authentication required."
+
+  - task: "Company Policy API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Company policy endpoint working perfectly. GET /api/company/policy returns comprehensive company information including: (1) Company info: Vishwas World Tech Private Limited, 100 DC Complex, Chandra Layout, Bangalore - 560040, working hours 9:45 AM to 6:45 PM, (2) Attendance policy: GPS-based tracking, late login penalties with specific amounts, (3) Salary policy: attendance-based calculation, deductions (PF 12%, ESI 1.75%, PT ₹200), allowances (HRA 50% metro, DA 10%, medical ₹1,250, transport ₹1,600). All policy information verified correctly with 10 validation checks passed. JWT authentication required."
+
 agent_communication:
     - agent: "main"
       message: "Completed HRMS Dashboard MVP implementation. Frontend is working perfectly with login, dashboard, employee management, and attendance views. Need to test all backend APIs to ensure they work correctly. Admin user created with credentials: username='admin', password='admin123'"
