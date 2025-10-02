@@ -316,13 +316,13 @@ class EnhancedHRMSAPITester:
             files = {
                 'file': ('test_file.xyz', io.BytesIO(invalid_file_content), 'application/octet-stream')
             }
-            data = {
+            params = {
                 'document_type': 'Other',
                 'description': 'Test invalid file type'
             }
             
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/upload-document", 
-                                   files=files, data=data, headers=headers)
+                                   files=files, params=params, headers=headers)
             
             if response.status_code == 400:
                 self.log_result("document_management", "Upload Invalid File Type", True, 
