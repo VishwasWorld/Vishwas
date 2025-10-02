@@ -385,6 +385,223 @@ const Dashboard = () => {
     </div>
   );
 
+  if (showSalaryCalculator && selectedEmployee) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-xl shadow-sm p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Salary Calculator</h2>
+              <button
+                onClick={() => setShowSalaryCalculator(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Employee Info */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-2">Employee Information</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <span className="text-sm text-blue-600">Employee ID</span>
+                  <div className="font-medium">{selectedEmployee.employee_id}</div>
+                </div>
+                <div>
+                  <span className="text-sm text-blue-600">Name</span>
+                  <div className="font-medium">{selectedEmployee.full_name}</div>
+                </div>
+                <div>
+                  <span className="text-sm text-blue-600">Department</span>
+                  <div className="font-medium">{selectedEmployee.department}</div>
+                </div>
+                <div>
+                  <span className="text-sm text-blue-600">Basic Salary</span>
+                  <div className="font-medium">₹{selectedEmployee.basic_salary.toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Calculation Controls */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                <select
+                  value={calculationYear}
+                  onChange={(e) => setCalculationYear(parseInt(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  {[2024, 2025, 2026].map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                <select
+                  value={calculationMonth}
+                  onChange={(e) => setCalculationMonth(parseInt(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  {[
+                    {value: 1, name: 'January'}, {value: 2, name: 'February'}, {value: 3, name: 'March'},
+                    {value: 4, name: 'April'}, {value: 5, name: 'May'}, {value: 6, name: 'June'},
+                    {value: 7, name: 'July'}, {value: 8, name: 'August'}, {value: 9, name: 'September'},
+                    {value: 10, name: 'October'}, {value: 11, name: 'November'}, {value: 12, name: 'December'}
+                  ].map(month => (
+                    <option key={month.value} value={month.value}>{month.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex items-end">
+                <button
+                  onClick={() => calculateSalary(selectedEmployee.employee_id, calculationYear, calculationMonth)}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+                >
+                  Calculate Salary
+                </button>
+              </div>
+            </div>
+
+            {/* Salary Calculation Results */}
+            {salaryCalculation && (
+              <div className="space-y-6">
+                {/* Attendance Summary */}
+                <div className="bg-yellow-50 rounded-lg p-4">
+                  <h4 className="text-lg font-semibold text-yellow-800 mb-3">Attendance Summary</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <span className="text-sm text-yellow-600">Present Days</span>
+                      <div className="text-xl font-bold">{salaryCalculation.employee_details.present_days}</div>
+                    </div>
+                    <div>
+                      <span className="text-sm text-yellow-600">Total Working Days</span>
+                      <div className="text-xl font-bold">{salaryCalculation.employee_details.total_working_days}</div>
+                    </div>
+                    <div>
+                      <span className="text-sm text-yellow-600">Absent Days</span>
+                      <div className="text-xl font-bold">{salaryCalculation.employee_details.total_working_days - salaryCalculation.employee_details.present_days}</div>
+                    </div>
+                    <div>
+                      <span className="text-sm text-yellow-600">Attendance %</span>
+                      <div className="text-xl font-bold">{salaryCalculation.employee_details.attendance_percentage}%</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Salary Breakdown */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Earnings */}
+                  <div className="bg-green-50 rounded-lg p-6">
+                    <h4 className="text-lg font-semibold text-green-800 mb-4">Earnings</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span>Basic Salary</span>
+                        <span className="font-medium">₹{salaryCalculation.earnings.basic_salary.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>HRA (40%)</span>
+                        <span className="font-medium">₹{salaryCalculation.earnings.hra.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>DA (10%)</span>
+                        <span className="font-medium">₹{salaryCalculation.earnings.da.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Medical Allowance</span>
+                        <span className="font-medium">₹{salaryCalculation.earnings.medical_allowance.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Transport Allowance</span>
+                        <span className="font-medium">₹{salaryCalculation.earnings.transport_allowance.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-t pt-2 font-bold text-green-700">
+                        <span>Gross Salary</span>
+                        <span>₹{salaryCalculation.earnings.gross_salary.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Deductions */}
+                  <div className="bg-red-50 rounded-lg p-6">
+                    <h4 className="text-lg font-semibold text-red-800 mb-4">Deductions</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span>PF (12%)</span>
+                        <span className="font-medium">₹{salaryCalculation.deductions.pf_employee.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>ESI (1.75%)</span>
+                        <span className="font-medium">₹{salaryCalculation.deductions.esi_employee.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Professional Tax</span>
+                        <span className="font-medium">₹{salaryCalculation.deductions.professional_tax.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Income Tax</span>
+                        <span className="font-medium">₹{salaryCalculation.deductions.income_tax.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-t pt-2 font-bold text-red-700">
+                        <span>Total Deductions</span>
+                        <span>₹{salaryCalculation.deductions.total_deductions.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Net Salary */}
+                <div className="bg-blue-600 text-white rounded-lg p-6">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-2xl font-bold">Net Salary Payable</h4>
+                    <span className="text-3xl font-bold">₹{salaryCalculation.net_salary.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Employer Contributions */}
+                <div className="bg-purple-50 rounded-lg p-6">
+                  <h4 className="text-lg font-semibold text-purple-800 mb-4">Employer Contributions</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex justify-between">
+                      <span>PF (Employer)</span>
+                      <span className="font-medium">₹{salaryCalculation.employer_contributions.pf_employer.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>ESI (Employer)</span>
+                      <span className="font-medium">₹{salaryCalculation.employer_contributions.esi_employer.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between font-bold">
+                      <span>Total</span>
+                      <span>₹{salaryCalculation.employer_contributions.total_employer_contribution.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => generateSalarySlip(selectedEmployee.employee_id, calculationYear, calculationMonth)}
+                    className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition flex items-center justify-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Download Salary Slip</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (showAddEmployee) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
