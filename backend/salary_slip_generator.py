@@ -99,7 +99,7 @@ def generate_salary_slip_content(salary_calculation):
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
     ]))
     
-    story.append(Paragraph('<b>Salary Breakdown</b>', styles['Heading3']))
+    story.append(Paragraph('<b>Salary Breakdown</b>', styles['SectionHeader']))
     story.append(salary_table)
     story.append(Spacer(1, 20))
     
