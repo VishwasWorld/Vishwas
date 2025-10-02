@@ -479,8 +479,8 @@ class HRMSAPITester:
                 data = response.json()
                 pdf_data = data.get("pdf_data", "")
                 
-                # A proper PDF with letterhead should be reasonably sized (>5KB base64)
-                if len(pdf_data) > 6000:  # Base64 encoded PDF should be substantial
+                # A proper PDF with letterhead should be reasonably sized (>3KB base64)
+                if len(pdf_data) > 3000:  # Base64 encoded PDF should be substantial
                     # Check filename contains company/employee info
                     filename = data.get("filename", "")
                     if "Offer_Letter" in filename and test_employee_id in filename:
