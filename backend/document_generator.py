@@ -70,7 +70,7 @@ def generate_offer_letter(employee_data):
     • Department: {employee_data["department"]}<br/>
     • Employee ID: {employee_data["employee_id"]}<br/>
     • Reporting Manager: {employee_data.get("manager", "To be assigned")}<br/>
-    • Joining Date: {datetime.fromisoformat(employee_data["join_date"].replace('Z', '+00:00')).strftime('%B %d, %Y')}<br/>
+    • Joining Date: {datetime.fromisoformat(employee_data["join_date"].replace('Z', '+00:00')).strftime('%B %d, %Y') if isinstance(employee_data["join_date"], str) else employee_data["join_date"].strftime('%B %d, %Y')}<br/>
     <br/>
     <b>Compensation Package:</b><br/>
     • Basic Salary: ₹{employee_data["basic_salary"]:,.2f} per month<br/>
