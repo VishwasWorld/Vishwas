@@ -45,7 +45,7 @@ async def create_admin_user():
         "basic_salary": 50000.0,
         "status": "Active",
         "username": "admin",
-        "password_hash": pwd_context.hash("admin123"),
+        "password_hash": simple_hash("admin123"),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
