@@ -412,6 +412,22 @@ const Dashboard = () => {
     setSalaryCalculation(null);
   };
 
+  const handleDeleteEmployee = async (employeeId) => {
+    try {
+      const response = await axios.delete(`${API}/employees/${employeeId}`);
+      alert(response.data.message);
+      fetchEmployees();
+      fetchDashboardStats();
+      setShowDeleteConfirm(null);
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error deleting employee');
+    }
+  };
+
+  const confirmDelete = (employee) => {
+    setShowDeleteConfirm(employee);
+  };
+
   const isLoggedInToday = (employeeId) => {
     return todayAttendance.some(record => 
       record.employee_id === employeeId && record.status === 'Logged In'
