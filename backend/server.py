@@ -816,6 +816,8 @@ async def delete_announcement(announcement_id: str, current_user: dict = Depends
         
         return {"message": "Announcement deleted successfully"}
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting announcement: {str(e)}")
 
