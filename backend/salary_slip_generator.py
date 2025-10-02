@@ -126,7 +126,7 @@ def generate_salary_slip_content(salary_calculation):
     
     # Employer contributions
     employer_contrib = salary_calculation['employer_contributions']
-    story.append(Paragraph('<b>Employer Contributions</b>', styles['Heading3']))
+    story.append(Paragraph('<b>Employer Contributions</b>', styles['SectionHeader']))
     
     employer_data = [
         ['PF (Employer Contribution)', f"₹{employer_contrib['pf_employer']:,.2f}"],
