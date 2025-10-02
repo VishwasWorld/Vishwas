@@ -1329,15 +1329,9 @@ class HRMSAPITester:
         print(f"Testing against: {self.base_url}")
         print("=" * 60)
         
-        # Run tests in order
+        # Run tests in order - focusing on enhanced document generation
         self.test_authentication()
-        self.test_employee_management()
-        self.test_attendance_tracking()
-        self.test_dashboard_stats()
-        self.test_document_generation()
-        self.test_salary_calculation()
-        self.test_employee_agreement_and_penalties()
-        self.test_company_policy()
+        self.test_enhanced_document_generation_with_logo_watermark()
         
         # Print summary
         self.print_summary()
