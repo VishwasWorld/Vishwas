@@ -848,7 +848,7 @@ const Dashboard = () => {
       {/* Enhanced Navigation */}
       <nav className="bg-white border-b-2 border-blue-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex space-x-12">
+          <div className="flex space-x-8">
             <button
               onClick={() => setCurrentView('dashboard')}
               className={`py-4 px-4 border-b-3 font-semibold text-base transition-all duration-200 ${
@@ -878,6 +878,26 @@ const Dashboard = () => {
               }`}
             >
               📍 Attendance
+            </button>
+            <button
+              onClick={() => setCurrentView('documents')}
+              className={`py-4 px-4 border-b-3 font-semibold text-base transition-all duration-200 ${
+                currentView === 'documents' 
+                  ? 'border-blue-600 text-blue-700 bg-blue-50' 
+                  : 'border-transparent text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              📁 Documents
+            </button>
+            <button
+              onClick={() => setCurrentView('announcements')}
+              className={`py-4 px-4 border-b-3 font-semibold text-base transition-all duration-200 ${
+                currentView === 'announcements' 
+                  ? 'border-blue-600 text-blue-700 bg-blue-50' 
+                  : 'border-transparent text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              📢 Announcements
             </button>
           </div>
         </div>
