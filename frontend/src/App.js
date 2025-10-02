@@ -825,39 +825,39 @@ const Dashboard = () => {
       {/* Professional Header with Logo */}
       <ProfessionalHeader user={user} logout={logout} />
 
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200">
+      {/* Enhanced Navigation */}
+      <nav className="bg-white border-b-2 border-blue-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex space-x-8">
+          <div className="flex space-x-12">
             <button
               onClick={() => setCurrentView('dashboard')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition ${
+              className={`py-4 px-4 border-b-3 font-semibold text-base transition-all duration-200 ${
                 currentView === 'dashboard' 
-                  ? 'border-blue-500 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-blue-600 text-blue-700 bg-blue-50' 
+                  : 'border-transparent text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              Dashboard
+              📊 Dashboard
             </button>
             <button
               onClick={() => setCurrentView('employees')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition ${
+              className={`py-4 px-4 border-b-3 font-semibold text-base transition-all duration-200 ${
                 currentView === 'employees' 
-                  ? 'border-blue-500 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-blue-600 text-blue-700 bg-blue-50' 
+                  : 'border-transparent text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              Employees
+              👥 Employees
             </button>
             <button
               onClick={() => setCurrentView('attendance')}
-              className={`py-4 px-2 border-b-2 font-medium text-sm transition ${
+              className={`py-4 px-4 border-b-3 font-semibold text-base transition-all duration-200 ${
                 currentView === 'attendance' 
-                  ? 'border-blue-500 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-blue-600 text-blue-700 bg-blue-50' 
+                  : 'border-transparent text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              Attendance
+              📍 Attendance
             </button>
           </div>
         </div>
