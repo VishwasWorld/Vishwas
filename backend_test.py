@@ -23,7 +23,8 @@ class HRMSAPITester:
             "authentication": {"passed": 0, "failed": 0, "details": []},
             "employees": {"passed": 0, "failed": 0, "details": []},
             "attendance": {"passed": 0, "failed": 0, "details": []},
-            "dashboard": {"passed": 0, "failed": 0, "details": []}
+            "dashboard": {"passed": 0, "failed": 0, "details": []},
+            "documents": {"passed": 0, "failed": 0, "details": []}
         }
         self.created_employee_id = None
         
