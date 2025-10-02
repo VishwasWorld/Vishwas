@@ -806,6 +806,341 @@ class HRMSAPITester:
                 
         except Exception as e:
             self.log_result("salary", "Different Month Working Days", False, f"Exception: {str(e)}")
+
+    def test_employee_agreement_and_penalties(self):
+        """Test employee agreement generation and late penalty calculation"""
+        print("\n=== TESTING EMPLOYEE AGREEMENT & LATE PENALTY SYSTEM ===")
+        
+        if not self.auth_token:
+            self.log_result("employee_agreement", "Employee Agreement Tests", False, "No auth token available")
+            return
+            
+        headers = self.get_auth_headers()
+        
+        # Use admin employee ID for testing
+        test_employee_id = "VWT001"  # Admin employee ID from database
+        
+        # Test 1: Generate employee agreement for admin user
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-employee-agreement", 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["message", "document_type", "employee_id", "employee_name", "pdf_data", "filename"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify document type
+                    if data["document_type"] == "employee_agreement":
+                        # Verify PDF data is base64 encoded
+                        try:
+                            import base64
+                            pdf_bytes = base64.b64decode(data["pdf_data"])
+                            pdf_valid = True
+                            pdf_size = len(pdf_bytes)
+                        except:
+                            pdf_valid = False
+                            pdf_size = 0
+                            
+                        if pdf_valid and data["employee_id"] == test_employee_id:
+                            # Check if PDF is substantial (should contain comprehensive agreement)
+                            if pdf_size > 10000:  # Agreement should be substantial
+                                self.log_result("employee_agreement", "Generate Employee Agreement", True, 
+                                              f"Successfully generated employee agreement for {data['employee_name']}, "
+                                              f"filename: {data['filename']}, PDF size: {pdf_size} bytes")
+                            else:
+                                self.log_result("employee_agreement", "Generate Employee Agreement", False, 
+                                              f"PDF appears too small for comprehensive agreement: {pdf_size} bytes")
+                        else:
+                            self.log_result("employee_agreement", "Generate Employee Agreement", False, 
+                                          f"Invalid PDF data or employee ID mismatch")
+                    else:
+                        self.log_result("employee_agreement", "Generate Employee Agreement", False, 
+                                      f"Wrong document type: {data['document_type']}")
+                else:
+                    missing_fields = [field for field in required_fields if field not in data]
+                    self.log_result("employee_agreement", "Generate Employee Agreement", False, 
+                                  f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("employee_agreement", "Generate Employee Agreement", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Generate Employee Agreement", False, f"Exception: {str(e)}")
+            
+        # Test 2: Test late login penalty calculation - On time (9:45 AM)
+        try:
+            response = requests.post(f"{self.base_url}/attendance/calculate-late-penalty", 
+                                   params={"employee_id": test_employee_id, "login_time": "09:45"}, 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                penalty_data = response.json()
+                required_fields = ["employee_id", "login_time", "scheduled_time", "penalty_amount", "delay_minutes", "category"]
+                
+                if all(field in penalty_data for field in required_fields):
+                    if penalty_data["penalty_amount"] == 0 and penalty_data["delay_minutes"] == 0:
+                        self.log_result("employee_agreement", "Late Penalty - On Time", True, 
+                                      f"Correctly calculated ₹0 penalty for on-time login (9:45 AM)")
+                    else:
+                        self.log_result("employee_agreement", "Late Penalty - On Time", False, 
+                                      f"Expected ₹0 penalty for on-time, got ₹{penalty_data['penalty_amount']}")
+                else:
+                    missing_fields = [field for field in required_fields if field not in penalty_data]
+                    self.log_result("employee_agreement", "Late Penalty - On Time", False, 
+                                  f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("employee_agreement", "Late Penalty - On Time", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Late Penalty - On Time", False, f"Exception: {str(e)}")
+            
+        # Test 3: Test late login penalty - 15 minutes late (grace period)
+        try:
+            response = requests.post(f"{self.base_url}/attendance/calculate-late-penalty", 
+                                   params={"employee_id": test_employee_id, "login_time": "10:00"}, 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                penalty_data = response.json()
+                if penalty_data["penalty_amount"] == 0 and penalty_data["delay_minutes"] == 15:
+                    self.log_result("employee_agreement", "Late Penalty - Grace Period", True, 
+                                  f"Correctly calculated ₹0 penalty for 15 minutes late (grace period)")
+                else:
+                    self.log_result("employee_agreement", "Late Penalty - Grace Period", False, 
+                                  f"Expected ₹0 penalty for grace period, got ₹{penalty_data['penalty_amount']}")
+            else:
+                self.log_result("employee_agreement", "Late Penalty - Grace Period", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Late Penalty - Grace Period", False, f"Exception: {str(e)}")
+            
+        # Test 4: Test late login penalty - 25 minutes late (₹200 penalty)
+        try:
+            response = requests.post(f"{self.base_url}/attendance/calculate-late-penalty", 
+                                   params={"employee_id": test_employee_id, "login_time": "10:10"}, 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                penalty_data = response.json()
+                if penalty_data["penalty_amount"] == 200 and penalty_data["delay_minutes"] == 25:
+                    self.log_result("employee_agreement", "Late Penalty - 25 Minutes", True, 
+                                  f"Correctly calculated ₹200 penalty for 25 minutes late")
+                else:
+                    self.log_result("employee_agreement", "Late Penalty - 25 Minutes", False, 
+                                  f"Expected ₹200 penalty for 25 min late, got ₹{penalty_data['penalty_amount']}")
+            else:
+                self.log_result("employee_agreement", "Late Penalty - 25 Minutes", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Late Penalty - 25 Minutes", False, f"Exception: {str(e)}")
+            
+        # Test 5: Test late login penalty - 45 minutes late (₹500 penalty)
+        try:
+            response = requests.post(f"{self.base_url}/attendance/calculate-late-penalty", 
+                                   params={"employee_id": test_employee_id, "login_time": "10:30"}, 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                penalty_data = response.json()
+                if penalty_data["penalty_amount"] == 500 and penalty_data["delay_minutes"] == 45:
+                    self.log_result("employee_agreement", "Late Penalty - 45 Minutes", True, 
+                                  f"Correctly calculated ₹500 penalty for 45 minutes late")
+                else:
+                    self.log_result("employee_agreement", "Late Penalty - 45 Minutes", False, 
+                                  f"Expected ₹500 penalty for 45 min late, got ₹{penalty_data['penalty_amount']}")
+            else:
+                self.log_result("employee_agreement", "Late Penalty - 45 Minutes", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Late Penalty - 45 Minutes", False, f"Exception: {str(e)}")
+            
+        # Test 6: Test late login penalty - 90 minutes late (₹1,000 penalty)
+        try:
+            response = requests.post(f"{self.base_url}/attendance/calculate-late-penalty", 
+                                   params={"employee_id": test_employee_id, "login_time": "11:15"}, 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                penalty_data = response.json()
+                if penalty_data["penalty_amount"] == 1000 and penalty_data["delay_minutes"] == 90:
+                    self.log_result("employee_agreement", "Late Penalty - 90 Minutes", True, 
+                                  f"Correctly calculated ₹1,000 penalty for 90 minutes late")
+                else:
+                    self.log_result("employee_agreement", "Late Penalty - 90 Minutes", False, 
+                                  f"Expected ₹1,000 penalty for 90 min late, got ₹{penalty_data['penalty_amount']}")
+            else:
+                self.log_result("employee_agreement", "Late Penalty - 90 Minutes", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Late Penalty - 90 Minutes", False, f"Exception: {str(e)}")
+            
+        # Test 7: Test with invalid employee ID for agreement generation
+        try:
+            invalid_employee_id = "INVALID123"
+            response = requests.post(f"{self.base_url}/employees/{invalid_employee_id}/generate-employee-agreement", 
+                                   headers=headers)
+            
+            if response.status_code == 404:
+                self.log_result("employee_agreement", "Invalid Employee ID Error", True, 
+                              "Correctly returned 404 for invalid employee ID in agreement generation")
+            else:
+                self.log_result("employee_agreement", "Invalid Employee ID Error", False, 
+                              f"Expected 404, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Invalid Employee ID Error", False, f"Exception: {str(e)}")
+            
+        # Test 8: Test authentication requirement for agreement endpoint
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-employee-agreement")  # No auth header
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("employee_agreement", "Agreement Auth Required", True, 
+                              "Correctly requires authentication for employee agreement generation")
+            else:
+                self.log_result("employee_agreement", "Agreement Auth Required", False, 
+                              f"Expected 401/403, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Agreement Auth Required", False, f"Exception: {str(e)}")
+            
+        # Test 9: Test authentication requirement for penalty calculation
+        try:
+            response = requests.post(f"{self.base_url}/attendance/calculate-late-penalty", 
+                                   params={"employee_id": test_employee_id, "login_time": "10:00"})  # No auth header
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("employee_agreement", "Penalty Auth Required", True, 
+                              "Correctly requires authentication for penalty calculation")
+            else:
+                self.log_result("employee_agreement", "Penalty Auth Required", False, 
+                              f"Expected 401/403, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("employee_agreement", "Penalty Auth Required", False, f"Exception: {str(e)}")
+
+    def test_company_policy(self):
+        """Test company policy endpoint"""
+        print("\n=== TESTING COMPANY POLICY API ===")
+        
+        if not self.auth_token:
+            self.log_result("company_policy", "Company Policy Tests", False, "No auth token available")
+            return
+            
+        headers = self.get_auth_headers()
+        
+        # Test: Get company policy
+        try:
+            response = requests.get(f"{self.base_url}/company/policy", headers=headers)
+            
+            if response.status_code == 200:
+                policy_data = response.json()
+                required_sections = ["company_info", "attendance_policy", "salary_policy"]
+                
+                if all(section in policy_data for section in required_sections):
+                    company_info = policy_data["company_info"]
+                    attendance_policy = policy_data["attendance_policy"]
+                    salary_policy = policy_data["salary_policy"]
+                    
+                    # Verify company information
+                    company_checks = []
+                    if company_info.get("name") == "Vishwas World Tech Private Limited":
+                        company_checks.append("✓ Company name correct")
+                    else:
+                        company_checks.append(f"✗ Company name incorrect: {company_info.get('name')}")
+                        
+                    if "100 DC Complex, Chandra Layout, Bangalore - 560040" in company_info.get("address", ""):
+                        company_checks.append("✓ Company address correct")
+                    else:
+                        company_checks.append(f"✗ Company address incorrect: {company_info.get('address')}")
+                        
+                    # Verify working hours
+                    working_hours = company_info.get("working_hours", {})
+                    if working_hours.get("start_time") == "09:45 AM" and working_hours.get("end_time") == "06:45 PM":
+                        company_checks.append("✓ Working hours correct (9:45 AM to 6:45 PM)")
+                    else:
+                        company_checks.append(f"✗ Working hours incorrect: {working_hours.get('start_time')} to {working_hours.get('end_time')}")
+                        
+                    # Verify late login penalties
+                    late_penalties = attendance_policy.get("late_login_penalties", [])
+                    penalty_checks = []
+                    
+                    expected_penalties = [
+                        {"range": "Up to 15 minutes", "penalty": "₹0 (Grace period)"},
+                        {"range": "16-30 minutes", "penalty": "₹200 per occurrence"},
+                        {"range": "31-60 minutes", "penalty": "₹500 per occurrence"},
+                        {"range": "More than 60 minutes", "penalty": "₹1,000 per occurrence"}
+                    ]
+                    
+                    for expected in expected_penalties:
+                        found = any(p.get("range") == expected["range"] and p.get("penalty") == expected["penalty"] 
+                                  for p in late_penalties)
+                        if found:
+                            penalty_checks.append(f"✓ {expected['range']}: {expected['penalty']}")
+                        else:
+                            penalty_checks.append(f"✗ Missing or incorrect: {expected['range']}")
+                    
+                    # Verify salary policy
+                    salary_checks = []
+                    deductions = salary_policy.get("deductions", {})
+                    allowances = salary_policy.get("allowances", {})
+                    
+                    if deductions.get("pf") == "12% of basic salary":
+                        salary_checks.append("✓ PF deduction correct")
+                    else:
+                        salary_checks.append(f"✗ PF deduction incorrect: {deductions.get('pf')}")
+                        
+                    if deductions.get("esi") == "1.75% if gross ≤ ₹21,000":
+                        salary_checks.append("✓ ESI deduction correct")
+                    else:
+                        salary_checks.append(f"✗ ESI deduction incorrect: {deductions.get('esi')}")
+                        
+                    if allowances.get("hra") == "50% of basic (Metro rate)":
+                        salary_checks.append("✓ HRA allowance correct")
+                    else:
+                        salary_checks.append(f"✗ HRA allowance incorrect: {allowances.get('hra')}")
+                    
+                    # Compile results
+                    all_checks = company_checks + penalty_checks + salary_checks
+                    failed_checks = [check for check in all_checks if check.startswith("✗")]
+                    
+                    if not failed_checks:
+                        self.log_result("company_policy", "Company Policy Content", True, 
+                                      f"All policy information verified correctly: {len(all_checks)} checks passed")
+                    else:
+                        self.log_result("company_policy", "Company Policy Content", False, 
+                                      f"Policy verification failed: {'; '.join(failed_checks)}")
+                        
+                else:
+                    missing_sections = [section for section in required_sections if section not in policy_data]
+                    self.log_result("company_policy", "Company Policy Content", False, 
+                                  f"Missing policy sections: {missing_sections}")
+            else:
+                self.log_result("company_policy", "Company Policy Content", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("company_policy", "Company Policy Content", False, f"Exception: {str(e)}")
+            
+        # Test authentication requirement for policy endpoint
+        try:
+            response = requests.get(f"{self.base_url}/company/policy")  # No auth header
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("company_policy", "Policy Auth Required", True, 
+                              "Correctly requires authentication for company policy")
+            else:
+                self.log_result("company_policy", "Policy Auth Required", False, 
+                              f"Expected 401/403, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("company_policy", "Policy Auth Required", False, f"Exception: {str(e)}")
             
     def run_all_tests(self):
         """Run all test suites"""
