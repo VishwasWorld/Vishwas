@@ -695,6 +695,8 @@ async def upload_employee_document(
             )
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading document: {str(e)}")
 
