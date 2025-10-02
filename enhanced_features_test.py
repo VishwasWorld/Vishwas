@@ -340,13 +340,13 @@ class EnhancedHRMSAPITester:
             files = {
                 'file': ('test.txt', io.BytesIO(test_file_content), 'text/plain')
             }
-            data = {
+            params = {
                 'document_type': 'Resume',
                 'description': 'Test document'
             }
             
             response = requests.post(f"{self.base_url}/employees/NONEXISTENT123/upload-document", 
-                                   files=files, data=data, headers=headers)
+                                   files=files, params=params, headers=headers)
             
             if response.status_code == 404:
                 self.log_result("document_management", "Upload for Non-existent Employee", True, 
