@@ -21,21 +21,14 @@ def generate_offer_letter_content(employee_data):
     """Generate offer letter content for watermarked document"""
     # Get enhanced professional styles
     styles = enhance_document_styling()
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=16,
-        spaceAfter=30,
-        alignment=TA_CENTER,
-        textColor=colors.darkblue
-    )
-    
+    # Professional date style
     date_style = ParagraphStyle(
         'DateStyle',
         parent=styles['Normal'],
-        fontSize=10,
+        fontSize=11,
         alignment=TA_RIGHT,
-        spaceAfter=20
+        spaceAfter=20,
+        fontName='Helvetica-Bold'
     )
     
     # Build document content
