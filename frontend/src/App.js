@@ -307,6 +307,60 @@ const Dashboard = () => {
     }
   };
 
+  const calculateSalary = async (employeeId, year, month) => {
+    try {
+      const response = await axios.post(`${API}/employees/${employeeId}/calculate-salary`, {
+        employee_id: employeeId,
+        year: year,
+        month: month
+      });
+      
+      setSalaryCalculation(response.data.calculation);
+      return response.data.calculation;
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error calculating salary');
+      return null;
+    }
+  };
+
+  const generateSalarySlip = async (employeeId, year, month) => {
+    try {
+      const response = await axios.post(`${API}/employees/${employeeId}/generate-salary-slip`, {
+        employee_id: employeeId,
+        year: year,
+        month: month
+      });
+      
+      // Convert base64 to blob and download
+      const pdfData = response.data.pdf_data;
+      const byteCharacters = atob(pdfData);
+      const byteNumbers = new Array(byteCharacters.length);
+      
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = response.data.filename;
+      link.click();
+      
+      alert('Salary slip generated and downloaded successfully!');
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error generating salary slip');
+    }
+  };
+
+  const openSalaryCalculator = (employee) => {
+    setSelectedEmployee(employee);
+    setShowSalaryCalculator(true);
+    setSalaryCalculation(null);
+  };
+
   const isLoggedInToday = (employeeId) => {
     return todayAttendance.some(record => 
       record.employee_id === employeeId && record.status === 'Logged In'
