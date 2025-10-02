@@ -25,6 +25,13 @@ db = client[os.environ['DB_NAME']]
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'vishwas-world-tech-secret-key-2024')
 ALGORITHM = "HS256"
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def simple_hash(password):
+    import hashlib
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password, hashed_password):
+    return simple_hash(plain_password) == hashed_password
 security = HTTPBearer()
 
 # Create the main app
