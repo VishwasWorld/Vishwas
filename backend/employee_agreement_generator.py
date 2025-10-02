@@ -248,7 +248,7 @@ def generate_employee_agreement_content(employee_data):
     story.append(Spacer(1, 20))
     
     # Acceptance and Signatures
-    story.append(Paragraph('<b>ACCEPTANCE AND SIGNATURES</b>', section_style))
+    story.append(Paragraph('<b>ACCEPTANCE AND SIGNATURES</b>', styles['SectionHeader']))
     
     acceptance_text = '''
     By signing below, both parties acknowledge that they have read, understood, and agree to be bound by all the terms and conditions of this Employment Agreement.
