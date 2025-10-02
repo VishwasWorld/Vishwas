@@ -347,6 +347,65 @@ async def get_dashboard_stats(current_user: dict = Depends(verify_token)):
         "absent_today": total_employees - present_today
     }
 
+# Document Generation Routes
+@api_router.post("/employees/{employee_id}/generate-offer-letter")
+async def generate_employee_offer_letter(employee_id: str, current_user: dict = Depends(verify_token)):
+    """Generate offer letter for employee"""
+    employee = await db.employees.find_one({"employee_id": employee_id})
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    try:
+        # Remove MongoDB ObjectId and parse dates
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Generate offer letter PDF
+        pdf_base64 = generate_offer_letter(employee)
+        
+        return {
+            "message": "Offer letter generated successfully",
+            "document_type": "offer_letter",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "pdf_data": pdf_base64,
+            "filename": f"Offer_Letter_{employee['full_name'].replace(' ', '_')}_{employee_id}.pdf"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating offer letter: {str(e)}")
+
+@api_router.post("/employees/{employee_id}/generate-appointment-letter")
+async def generate_employee_appointment_letter(employee_id: str, current_user: dict = Depends(verify_token)):
+    """Generate appointment letter for employee"""
+    employee = await db.employees.find_one({"employee_id": employee_id})
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    try:
+        # Remove MongoDB ObjectId and parse dates
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Generate appointment letter PDF
+        pdf_base64 = generate_appointment_letter(employee)
+        
+        return {
+            "message": "Appointment letter generated successfully",
+            "document_type": "appointment_letter",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "pdf_data": pdf_base64,
+            "filename": f"Appointment_Letter_{employee['full_name'].replace(' ', '_')}_{employee_id}.pdf"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating appointment letter: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
