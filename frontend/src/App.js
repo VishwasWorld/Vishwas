@@ -1017,32 +1017,32 @@ const Dashboard = () => {
                             {employee.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <div className="flex space-x-2">
+                        <td className="px-4 py-4 text-sm">
+                          <div className="flex flex-wrap gap-1">
                             <button
                               onClick={() => generateDocument(employee.employee_id, 'offer')}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
+                              className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition"
                               title="Generate Offer Letter"
                             >
-                              Offer Letter
+                              Offer
                             </button>
                             <button
                               onClick={() => generateDocument(employee.employee_id, 'appointment')}
-                              className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition"
+                              className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition"
                               title="Generate Appointment Letter"
                             >
-                              Appointment Letter
+                              Appointment
                             </button>
                             <button
                               onClick={() => openSalaryCalculator(employee)}
-                              className="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700 transition"
+                              className="bg-yellow-600 text-white px-2 py-1 rounded text-xs hover:bg-yellow-700 transition"
                               title="Calculate Salary"
                             >
-                              Calculate Salary
+                              Salary
                             </button>
                             <button
                               onClick={() => generateDocument(employee.employee_id, 'agreement')}
-                              className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition"
+                              className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition"
                               title="Generate Employee Agreement"
                             >
                               Agreement
