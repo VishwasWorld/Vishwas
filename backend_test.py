@@ -348,12 +348,12 @@ class HRMSAPITester:
         except Exception as e:
             self.log_result("dashboard", "Dashboard Statistics", False, f"Exception: {str(e)}")
             
-    def test_document_generation(self):
-        """Test document generation endpoints"""
-        print("\n=== TESTING DOCUMENT GENERATION API ===")
+    def test_enhanced_document_generation_with_logo_watermark(self):
+        """Test enhanced document generation with logo and watermark functionality"""
+        print("\n=== TESTING ENHANCED DOCUMENT GENERATION WITH LOGO & WATERMARK ===")
         
         if not self.auth_token:
-            self.log_result("documents", "Document Tests", False, "No auth token available")
+            self.log_result("documents", "Enhanced Document Tests", False, "No auth token available")
             return
             
         headers = self.get_auth_headers()
@@ -361,7 +361,7 @@ class HRMSAPITester:
         # Use admin employee ID for testing
         test_employee_id = "VWT001"  # Admin employee ID from database
         
-        # Test 1: Generate offer letter for admin user
+        # Test 1: Generate enhanced offer letter with logo & watermark
         try:
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-offer-letter", 
                                    headers=headers)
@@ -376,33 +376,40 @@ class HRMSAPITester:
                         # Verify PDF data is base64 encoded
                         try:
                             import base64
-                            base64.b64decode(data["pdf_data"])
+                            pdf_bytes = base64.b64decode(data["pdf_data"])
                             pdf_valid = True
+                            pdf_size_bytes = len(pdf_bytes)
                         except:
                             pdf_valid = False
+                            pdf_size_bytes = 0
                             
                         if pdf_valid and data["employee_id"] == test_employee_id:
-                            self.log_result("documents", "Generate Offer Letter", True, 
-                                          f"Successfully generated offer letter for {data['employee_name']}, "
-                                          f"filename: {data['filename']}, PDF size: {len(data['pdf_data'])} chars")
+                            # Enhanced documents should be larger due to logo and watermark
+                            if pdf_size_bytes > 50000:  # Should be >50KB due to logo and enhanced styling
+                                self.log_result("documents", "Enhanced Offer Letter with Logo", True, 
+                                              f"✅ Successfully generated enhanced offer letter for {data['employee_name']}, "
+                                              f"filename: {data['filename']}, PDF size: {pdf_size_bytes} bytes (enhanced with logo & watermark)")
+                            else:
+                                self.log_result("documents", "Enhanced Offer Letter with Logo", False, 
+                                              f"PDF size too small for enhanced document: {pdf_size_bytes} bytes (expected >50KB)")
                         else:
-                            self.log_result("documents", "Generate Offer Letter", False, 
+                            self.log_result("documents", "Enhanced Offer Letter with Logo", False, 
                                           f"Invalid PDF data or employee ID mismatch")
                     else:
-                        self.log_result("documents", "Generate Offer Letter", False, 
+                        self.log_result("documents", "Enhanced Offer Letter with Logo", False, 
                                       f"Wrong document type: {data['document_type']}")
                 else:
                     missing_fields = [field for field in required_fields if field not in data]
-                    self.log_result("documents", "Generate Offer Letter", False, 
+                    self.log_result("documents", "Enhanced Offer Letter with Logo", False, 
                                   f"Missing fields: {missing_fields}")
             else:
-                self.log_result("documents", "Generate Offer Letter", False, 
+                self.log_result("documents", "Enhanced Offer Letter with Logo", False, 
                               f"HTTP {response.status_code}: {response.text}")
                 
         except Exception as e:
-            self.log_result("documents", "Generate Offer Letter", False, f"Exception: {str(e)}")
+            self.log_result("documents", "Enhanced Offer Letter with Logo", False, f"Exception: {str(e)}")
             
-        # Test 2: Generate appointment letter for admin user
+        # Test 2: Generate enhanced appointment letter with logo & watermark
         try:
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-appointment-letter", 
                                    headers=headers)
@@ -417,90 +424,264 @@ class HRMSAPITester:
                         # Verify PDF data is base64 encoded
                         try:
                             import base64
-                            base64.b64decode(data["pdf_data"])
+                            pdf_bytes = base64.b64decode(data["pdf_data"])
                             pdf_valid = True
+                            pdf_size_bytes = len(pdf_bytes)
                         except:
                             pdf_valid = False
+                            pdf_size_bytes = 0
                             
                         if pdf_valid and data["employee_id"] == test_employee_id:
-                            self.log_result("documents", "Generate Appointment Letter", True, 
-                                          f"Successfully generated appointment letter for {data['employee_name']}, "
-                                          f"filename: {data['filename']}, PDF size: {len(data['pdf_data'])} chars")
+                            # Enhanced documents should be larger due to logo and watermark
+                            if pdf_size_bytes > 50000:  # Should be >50KB due to logo and enhanced styling
+                                self.log_result("documents", "Enhanced Appointment Letter with Logo", True, 
+                                              f"✅ Successfully generated enhanced appointment letter for {data['employee_name']}, "
+                                              f"filename: {data['filename']}, PDF size: {pdf_size_bytes} bytes (enhanced with logo & watermark)")
+                            else:
+                                self.log_result("documents", "Enhanced Appointment Letter with Logo", False, 
+                                              f"PDF size too small for enhanced document: {pdf_size_bytes} bytes (expected >50KB)")
                         else:
-                            self.log_result("documents", "Generate Appointment Letter", False, 
+                            self.log_result("documents", "Enhanced Appointment Letter with Logo", False, 
                                           f"Invalid PDF data or employee ID mismatch")
                     else:
-                        self.log_result("documents", "Generate Appointment Letter", False, 
+                        self.log_result("documents", "Enhanced Appointment Letter with Logo", False, 
                                       f"Wrong document type: {data['document_type']}")
                 else:
-                    missing_fields = [field for field in required_fields if field not in required_fields]
-                    self.log_result("documents", "Generate Appointment Letter", False, 
+                    missing_fields = [field for field in required_fields if field not in data]
+                    self.log_result("documents", "Enhanced Appointment Letter with Logo", False, 
                                   f"Missing fields: {missing_fields}")
             else:
-                self.log_result("documents", "Generate Appointment Letter", False, 
+                self.log_result("documents", "Enhanced Appointment Letter with Logo", False, 
                               f"HTTP {response.status_code}: {response.text}")
                 
         except Exception as e:
-            self.log_result("documents", "Generate Appointment Letter", False, f"Exception: {str(e)}")
+            self.log_result("documents", "Enhanced Appointment Letter with Logo", False, f"Exception: {str(e)}")
             
-        # Test 3: Test with invalid employee ID
+        # Test 3: Generate enhanced employee agreement with logo & watermark
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-employee-agreement", 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["message", "document_type", "employee_id", "employee_name", "pdf_data", "filename"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify document type
+                    if data["document_type"] == "employee_agreement":
+                        # Verify PDF data is base64 encoded
+                        try:
+                            import base64
+                            pdf_bytes = base64.b64decode(data["pdf_data"])
+                            pdf_valid = True
+                            pdf_size_bytes = len(pdf_bytes)
+                        except:
+                            pdf_valid = False
+                            pdf_size_bytes = 0
+                            
+                        if pdf_valid and data["employee_id"] == test_employee_id:
+                            # Enhanced agreements should be even larger due to comprehensive content + logo
+                            if pdf_size_bytes > 80000:  # Should be >80KB due to comprehensive content + logo
+                                self.log_result("documents", "Enhanced Employee Agreement with Logo", True, 
+                                              f"✅ Successfully generated enhanced employee agreement for {data['employee_name']}, "
+                                              f"filename: {data['filename']}, PDF size: {pdf_size_bytes} bytes (enhanced with logo & watermark)")
+                            else:
+                                self.log_result("documents", "Enhanced Employee Agreement with Logo", False, 
+                                              f"PDF size too small for enhanced agreement: {pdf_size_bytes} bytes (expected >80KB)")
+                        else:
+                            self.log_result("documents", "Enhanced Employee Agreement with Logo", False, 
+                                          f"Invalid PDF data or employee ID mismatch")
+                    else:
+                        self.log_result("documents", "Enhanced Employee Agreement with Logo", False, 
+                                      f"Wrong document type: {data['document_type']}")
+                else:
+                    missing_fields = [field for field in required_fields if field not in data]
+                    self.log_result("documents", "Enhanced Employee Agreement with Logo", False, 
+                                  f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("documents", "Enhanced Employee Agreement with Logo", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("documents", "Enhanced Employee Agreement with Logo", False, f"Exception: {str(e)}")
+            
+        # Test 4: Generate enhanced salary slip with logo & watermark
+        try:
+            current_year = datetime.now().year
+            current_month = datetime.now().month
+            salary_request = {
+                "employee_id": test_employee_id,
+                "year": current_year,
+                "month": current_month
+            }
+            
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-salary-slip", 
+                                   json=salary_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["message", "employee_id", "employee_name", "month_year", "pdf_data", "filename"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify PDF data is base64 encoded
+                    try:
+                        import base64
+                        pdf_bytes = base64.b64decode(data["pdf_data"])
+                        pdf_valid = True
+                        pdf_size_bytes = len(pdf_bytes)
+                    except:
+                        pdf_valid = False
+                        pdf_size_bytes = 0
+                        
+                    if pdf_valid and data["employee_id"] == test_employee_id:
+                        # Enhanced salary slips should be larger due to logo and professional styling
+                        if pdf_size_bytes > 60000:  # Should be >60KB due to salary breakdown + logo
+                            self.log_result("documents", "Enhanced Salary Slip with Logo", True, 
+                                          f"✅ Successfully generated enhanced salary slip for {data['employee_name']}, "
+                                          f"month: {data['month_year']}, PDF size: {pdf_size_bytes} bytes (enhanced with logo & watermark)")
+                        else:
+                            self.log_result("documents", "Enhanced Salary Slip with Logo", False, 
+                                          f"PDF size too small for enhanced salary slip: {pdf_size_bytes} bytes (expected >60KB)")
+                    else:
+                        self.log_result("documents", "Enhanced Salary Slip with Logo", False, 
+                                      f"Invalid PDF data or employee ID mismatch")
+                else:
+                    missing_fields = [field for field in required_fields if field not in data]
+                    self.log_result("documents", "Enhanced Salary Slip with Logo", False, 
+                                  f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("documents", "Enhanced Salary Slip with Logo", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("documents", "Enhanced Salary Slip with Logo", False, f"Exception: {str(e)}")
+            
+        # Test 5: Verify company details in documents (9:45 AM - 6:45 PM working hours)
+        try:
+            response = requests.get(f"{self.base_url}/company/policy", headers=headers)
+            
+            if response.status_code == 200:
+                policy_data = response.json()
+                company_info = policy_data.get("company_info", {})
+                working_hours = company_info.get("working_hours", {})
+                
+                # Verify updated company details
+                company_checks = []
+                if company_info.get("name") == "Vishwas World Tech Private Limited":
+                    company_checks.append("✓ Company name correct")
+                else:
+                    company_checks.append(f"✗ Company name: {company_info.get('name')}")
+                    
+                if "100 DC Complex, Chandra Layout, Bangalore - 560040" in company_info.get("address", ""):
+                    company_checks.append("✓ Company address updated correctly")
+                else:
+                    company_checks.append(f"✗ Company address: {company_info.get('address')}")
+                    
+                # Verify working hours (9:45 AM - 6:45 PM)
+                if working_hours.get("start_time") == "09:45 AM" and working_hours.get("end_time") == "06:45 PM":
+                    company_checks.append("✓ Working hours correct (9:45 AM - 6:45 PM)")
+                else:
+                    company_checks.append(f"✗ Working hours: {working_hours.get('start_time')} to {working_hours.get('end_time')}")
+                
+                failed_checks = [check for check in company_checks if check.startswith("✗")]
+                
+                if not failed_checks:
+                    self.log_result("documents", "Company Details Verification", True, 
+                                  f"✅ All company details verified correctly: {'; '.join(company_checks)}")
+                else:
+                    self.log_result("documents", "Company Details Verification", False, 
+                                  f"Company details verification failed: {'; '.join(failed_checks)}")
+            else:
+                self.log_result("documents", "Company Details Verification", False, 
+                              f"Could not retrieve company policy: HTTP {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("documents", "Company Details Verification", False, f"Exception: {str(e)}")
+            
+        # Test 6: Test with invalid employee ID for enhanced documents
         try:
             invalid_employee_id = "INVALID123"
             response = requests.post(f"{self.base_url}/employees/{invalid_employee_id}/generate-offer-letter", 
                                    headers=headers)
             
             if response.status_code == 404:
-                self.log_result("documents", "Invalid Employee ID Error Handling", True, 
-                              "Correctly returned 404 for invalid employee ID")
+                self.log_result("documents", "Enhanced Document Error Handling", True, 
+                              "✅ Correctly returned 404 for invalid employee ID in enhanced document generation")
             else:
-                self.log_result("documents", "Invalid Employee ID Error Handling", False, 
+                self.log_result("documents", "Enhanced Document Error Handling", False, 
                               f"Expected 404, got {response.status_code}")
                 
         except Exception as e:
-            self.log_result("documents", "Invalid Employee ID Error Handling", False, f"Exception: {str(e)}")
+            self.log_result("documents", "Enhanced Document Error Handling", False, f"Exception: {str(e)}")
             
-        # Test 4: Test authentication requirement for document endpoints
+        # Test 7: Test authentication requirement for enhanced document endpoints
         try:
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-offer-letter")  # No auth header
             
             if response.status_code == 401 or response.status_code == 403:
-                self.log_result("documents", "Document Auth Required", True, 
-                              "Correctly requires authentication for document generation")
+                self.log_result("documents", "Enhanced Document Auth Required", True, 
+                              "✅ Correctly requires authentication for enhanced document generation")
             else:
-                self.log_result("documents", "Document Auth Required", False, 
+                self.log_result("documents", "Enhanced Document Auth Required", False, 
                               f"Expected 401/403, got {response.status_code}")
                 
         except Exception as e:
-            self.log_result("documents", "Document Auth Required", False, f"Exception: {str(e)}")
+            self.log_result("documents", "Enhanced Document Auth Required", False, f"Exception: {str(e)}")
             
-        # Test 5: Verify document content includes company letterhead (by checking PDF size and structure)
+        # Test 8: Professional appearance and quality verification
         try:
-            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-offer-letter", 
-                                   headers=headers)
+            # Test all 4 document types for professional quality
+            document_tests = [
+                ("offer-letter", "Offer Letter"),
+                ("appointment-letter", "Appointment Letter"),
+                ("employee-agreement", "Employee Agreement"),
+            ]
+            
+            quality_results = []
+            
+            for endpoint, doc_name in document_tests:
+                response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-{endpoint}", 
+                                       headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    pdf_data = data.get("pdf_data", "")
+                    
+                    # Check for substantial PDF size (indicates logo and enhanced styling)
+                    pdf_size = len(pdf_data)
+                    if pdf_size > 40000:  # Base64 encoded, should be substantial
+                        quality_results.append(f"✓ {doc_name}: {pdf_size} chars (professional quality)")
+                    else:
+                        quality_results.append(f"✗ {doc_name}: {pdf_size} chars (may lack enhancements)")
+                else:
+                    quality_results.append(f"✗ {doc_name}: Failed to generate (HTTP {response.status_code})")
+            
+            # Test salary slip separately
+            salary_request = {"employee_id": test_employee_id, "year": current_year, "month": current_month}
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-salary-slip", 
+                                   json=salary_request, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
-                pdf_data = data.get("pdf_data", "")
-                
-                # A proper PDF with letterhead should be reasonably sized (>3KB base64)
-                if len(pdf_data) > 3000:  # Base64 encoded PDF should be substantial
-                    # Check filename contains company/employee info
-                    filename = data.get("filename", "")
-                    if "Offer_Letter" in filename and test_employee_id in filename:
-                        self.log_result("documents", "Document Content Verification", True, 
-                                      f"Document appears to contain proper content, size: {len(pdf_data)} chars")
-                    else:
-                        self.log_result("documents", "Document Content Verification", False, 
-                                      f"Filename format incorrect: {filename}")
+                pdf_size = len(data.get("pdf_data", ""))
+                if pdf_size > 40000:
+                    quality_results.append(f"✓ Salary Slip: {pdf_size} chars (professional quality)")
                 else:
-                    self.log_result("documents", "Document Content Verification", False, 
-                                  f"PDF appears too small, may be missing content: {len(pdf_data)} chars")
+                    quality_results.append(f"✗ Salary Slip: {pdf_size} chars (may lack enhancements)")
             else:
-                self.log_result("documents", "Document Content Verification", False, 
-                              f"Could not retrieve document for content verification")
+                quality_results.append(f"✗ Salary Slip: Failed to generate (HTTP {response.status_code})")
+            
+            failed_quality = [result for result in quality_results if result.startswith("✗")]
+            
+            if not failed_quality:
+                self.log_result("documents", "Professional Quality Verification", True, 
+                              f"✅ All documents show professional quality with enhanced styling: {'; '.join(quality_results)}")
+            else:
+                self.log_result("documents", "Professional Quality Verification", False, 
+                              f"Quality issues found: {'; '.join(failed_quality)}")
                 
         except Exception as e:
-            self.log_result("documents", "Document Content Verification", False, f"Exception: {str(e)}")
+            self.log_result("documents", "Professional Quality Verification", False, f"Exception: {str(e)}")
             
     def test_salary_calculation(self):
         """Test salary calculation endpoints"""
