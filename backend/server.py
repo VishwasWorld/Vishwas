@@ -306,6 +306,7 @@ async def get_today_attendance(current_user: dict = Depends(verify_token)):
     # Parse MongoDB data
     result = []
     for record in attendance_records:
+        record.pop("_id", None)  # Remove MongoDB ObjectId
         record = parse_from_mongo(record)
         result.append(record)
     
