@@ -283,21 +283,21 @@ def generate_employee_agreement_content(employee_data):
     ]))
     
     story.append(signature_table)
+    
+    # Legal disclaimer
     story.append(Spacer(1, 20))
+    story.append(Paragraph('<b><font color="red">IMPORTANT:</font></b> This is a legally binding document. Please read carefully before signing.', 
+                          ParagraphStyle('LegalNotice', parent=styles['Normal'], fontSize=10, alignment=TA_CENTER, 
+                                       textColor=colors.darkred, fontName='Helvetica-Bold')))
     
-    # Footer
-    story.append(Paragraph('This is a legally binding document. Please read carefully before signing.', 
-                          ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, 
-                                       textColor=colors.grey)))
+    # Professional footer
+    story.extend(create_professional_footer(styles))
     
-    # Build PDF
-    doc.build(story)
-    
-    # Get PDF data and encode to base64
-    pdf_data = buffer.getvalue()
-    buffer.close()
-    
-    return base64.b64encode(pdf_data).decode()
+    return story
+
+def generate_employee_agreement(employee_data):
+    """Generate professional employee agreement with logo and watermark"""
+    return create_watermarked_document(generate_employee_agreement_content, employee_data)
 
 def calculate_late_login_penalty(login_time_str, scheduled_time="09:45"):
     """
