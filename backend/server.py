@@ -619,6 +619,131 @@ async def generate_employee_salary_slip(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating salary slip: {str(e)}")
 
+@api_router.post("/employees/{employee_id}/generate-and-share-salary-slip")
+async def generate_and_share_salary_slip(
+    employee_id: str,
+    salary_request: SalarySlipShareRequest,
+    current_user: dict = Depends(verify_token)
+):
+    """Generate salary slip and share via multiple channels (Email, WhatsApp, SMS)"""
+    
+    # Get employee data
+    employee = await db.employees.find_one({"employee_id": employee_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Set default year/month if not provided
+    now = datetime.now(timezone.utc)
+    year = salary_request.year or now.year
+    month = salary_request.month or now.month
+    
+    try:
+        # Get employee attendance records
+        attendance_records = await db.attendance.find({"employee_id": employee_id}).to_list(1000)
+        
+        # Remove MongoDB ObjectId and parse dates
+        for record in attendance_records:
+            record.pop("_id", None)
+            record = parse_from_mongo(record)
+        
+        # Remove sensitive data from employee
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Calculate salary
+        salary_calculation = calculate_employee_salary(employee, attendance_records, year, month)
+        
+        # Generate standard salary slip PDF
+        pdf_base64 = generate_standard_salary_slip(salary_calculation)
+        
+        # Create communication service
+        comm_service = CommunicationService()
+        
+        # Send via selected channels
+        sharing_results = comm_service.send_salary_slip_all_channels(
+            employee, salary_calculation, pdf_base64, salary_request.channels
+        )
+        
+        # Add digital signature information
+        digital_signature = create_digital_signature_info()
+        
+        return {
+            "message": "Salary slip generated and shared successfully",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "month_year": f"{salary_calculation['employee_info']['calculation_month']}",
+            "sharing_results": sharing_results,
+            "digital_signature": digital_signature,
+            "channels_used": salary_request.channels,
+            "successful_deliveries": sharing_results["successful_channels"],
+            "failed_deliveries": sharing_results["failed_channels"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating and sharing salary slip: {str(e)}")
+
+@api_router.get("/salary/employee-selection")
+async def get_employees_for_salary_selection(current_user: dict = Depends(verify_token)):
+    """Get employees list for salary processing selection"""
+    try:
+        employees = await db.employees.find({"status": "Active"}).to_list(1000)
+        
+        # Format for selection dropdown
+        employee_list = []
+        for emp in employees:
+            emp.pop("_id", None)
+            emp.pop("password_hash", None)
+            employee_list.append({
+                "employee_id": emp["employee_id"],
+                "full_name": emp["full_name"],
+                "department": emp["department"],
+                "designation": emp["designation"],
+                "email_address": emp["email_address"],
+                "contact_number": emp["contact_number"],
+                "basic_salary": emp["basic_salary"]
+            })
+        
+        return {
+            "employees": employee_list,
+            "total_count": len(employee_list),
+            "message": "Employee list retrieved for salary processing"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching employees for salary selection: {str(e)}")
+
+@api_router.get("/salary/communication-channels")
+async def get_available_communication_channels():
+    """Get available communication channels for salary slip sharing"""
+    return {
+        "channels": [
+            {
+                "id": "email",
+                "name": "Email",
+                "description": "Send detailed salary slip PDF via email",
+                "icon": "📧",
+                "recommended": True
+            },
+            {
+                "id": "whatsapp",
+                "name": "WhatsApp",
+                "description": "Send notification with summary via WhatsApp Business",
+                "icon": "📱",
+                "recommended": True
+            },
+            {
+                "id": "sms",
+                "name": "SMS",
+                "description": "Send basic notification via SMS",
+                "icon": "💬",
+                "recommended": False
+            }
+        ],
+        "default_selection": ["email", "whatsapp"],
+        "note": "Email includes PDF attachment, WhatsApp and SMS provide notifications only"
+    }
+
 # Enhanced Employee Management Routes
 @api_router.delete("/employees/{employee_id}")
 async def delete_employee(employee_id: str, current_user: dict = Depends(verify_token)):
