@@ -94,8 +94,8 @@ def generate_employee_agreement_content(employee_data):
     # Build document content
     story = []
     
-    # Company header with logo
-    story.extend(create_company_header_with_logo(styles))
+    # Professional company header with logo
+    story.extend(create_professional_header_with_logo(styles))
     
     # Title
     story.append(Paragraph('<b>EMPLOYEE AGREEMENT</b>', title_style))
