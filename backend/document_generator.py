@@ -76,7 +76,7 @@ def generate_offer_letter_content(employee_data):
     Please confirm your acceptance by signing and returning a copy of this letter along with the required documents.
     '''
     
-    story.append(Paragraph(offer_content, styles['Normal']))
+    story.append(Paragraph(offer_content, styles['ProfessionalBody']))
     story.append(Spacer(1, 24))
     
     # Signature section
