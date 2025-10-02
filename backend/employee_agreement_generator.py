@@ -129,7 +129,7 @@ def generate_employee_agreement_content(employee_data):
     story.append(Spacer(1, 15))
     
     # Terms and Conditions
-    story.append(Paragraph('<b>TERMS AND CONDITIONS OF EMPLOYMENT</b>', section_style))
+    story.append(Paragraph('<b>TERMS AND CONDITIONS OF EMPLOYMENT</b>', styles['SectionHeader']))
     
     # 1. Position and Duties
     story.append(Paragraph('<b>1. POSITION AND DUTIES</b>', styles['Heading4']))
