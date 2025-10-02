@@ -18,6 +18,12 @@ from document_generator import generate_offer_letter, generate_appointment_lette
 from salary_calculator import SalaryCalculator, calculate_employee_salary, get_employee_attendance_days
 from salary_slip_generator import generate_salary_slip
 from employee_agreement_generator import generate_employee_agreement, calculate_late_login_penalty
+from enhanced_features import (
+    EmployeeDocument, CompanyAnnouncement, DocumentUpload, AnnouncementCreate,
+    EmployeeDocumentResponse, AnnouncementResponse, save_uploaded_file, 
+    get_file_as_base64, get_dashboard_theme, get_enhanced_dashboard_stats
+)
+from fastapi import UploadFile, File
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
