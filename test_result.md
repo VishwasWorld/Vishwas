@@ -120,6 +120,18 @@ backend:
           agent: "testing"
           comment: "✅ TESTED: All employee CRUD operations working perfectly. GET /api/employees returns employee list, POST /api/employees creates new employees with proper validation, GET /api/employees/{id} retrieves specific employee. Fixed minor bug in create_employee response model. Authentication properly required for all endpoints."
 
+  - task: "Document Generation API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Document generation endpoints working perfectly. POST /api/employees/{employee_id}/generate-offer-letter and POST /api/employees/{employee_id}/generate-appointment-letter both generate valid PDF documents with base64 encoding. Documents include Vishwas World Tech letterhead, proper salary breakdowns (Basic: ₹50,000, HRA: ₹20,000, DA: ₹5,000, Gross: ₹75,000), and all employee details. JWT authentication properly enforced. Error handling works correctly for invalid employee IDs (404). Fixed date parsing issue in document_generator.py during testing."
+
   - task: "Authentication System"
     implemented: true
     working: true
