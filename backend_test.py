@@ -510,6 +510,7 @@ class HRMSAPITester:
         self.test_employee_management()
         self.test_attendance_tracking()
         self.test_dashboard_stats()
+        self.test_document_generation()
         
         # Print summary
         self.print_summary()
