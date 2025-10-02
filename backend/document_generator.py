@@ -132,8 +132,8 @@ def generate_appointment_letter_content(employee_data):
     current_date = datetime.now(timezone.utc).strftime('%B %d, %Y')
     story.append(Paragraph(f'Date: {current_date}', date_style))
     
-    # Title
-    story.append(Paragraph('<b>APPOINTMENT LETTER</b>', title_style))
+    # Title with professional styling
+    story.append(Paragraph('<b>APPOINTMENT LETTER</b>', styles['CustomHeading']))
     
     # Employee details
     story.append(Paragraph(f'Dear {employee_data["full_name"]},', styles['Normal']))
