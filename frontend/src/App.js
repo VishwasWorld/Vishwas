@@ -791,6 +791,13 @@ const Dashboard = () => {
                             >
                               Appointment Letter
                             </button>
+                            <button
+                              onClick={() => openSalaryCalculator(employee)}
+                              className="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700 transition"
+                              title="Calculate Salary"
+                            >
+                              Calculate Salary
+                            </button>
                           </div>
                         </td>
                       </tr>
