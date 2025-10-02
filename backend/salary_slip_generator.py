@@ -19,23 +19,7 @@ def generate_salary_slip_content(salary_calculation):
     """Generate salary slip content for watermarked document"""
     # Get enhanced professional styles
     styles = enhance_document_styling()
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=18,
-        spaceAfter=20,
-        alignment=TA_CENTER,
-        textColor=colors.darkblue
-    )
-    
-    header_style = ParagraphStyle(
-        'HeaderStyle',
-        parent=styles['Heading2'],
-        fontSize=14,
-        spaceAfter=10,
-        alignment=TA_CENTER,
-        textColor=colors.darkblue
-    )
+    # Styles are now handled by enhance_document_styling()
     
     # Build document content
     story = []
