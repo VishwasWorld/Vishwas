@@ -412,6 +412,142 @@ async def generate_employee_appointment_letter(employee_id: str, current_user: d
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating appointment letter: {str(e)}")
 
+# Salary Calculation Routes
+@api_router.post("/employees/{employee_id}/calculate-salary")
+async def calculate_employee_monthly_salary(
+    employee_id: str, 
+    salary_request: SalaryCalculationRequest,
+    current_user: dict = Depends(verify_token)
+):
+    """Calculate monthly salary for employee based on attendance"""
+    
+    # Get employee data
+    employee = await db.employees.find_one({"employee_id": employee_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Set default year/month if not provided
+    now = datetime.now(timezone.utc)
+    year = salary_request.year or now.year
+    month = salary_request.month or now.month
+    
+    try:
+        # Get employee attendance records
+        attendance_records = await db.attendance.find({"employee_id": employee_id}).to_list(1000)
+        
+        # Remove MongoDB ObjectId and parse dates
+        for record in attendance_records:
+            record.pop("_id", None)
+            record = parse_from_mongo(record)
+        
+        # Remove sensitive data from employee
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Calculate salary
+        salary_calculation = calculate_employee_salary(employee, attendance_records, year, month)
+        
+        return {
+            "message": "Salary calculated successfully",
+            "calculation": salary_calculation
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calculating salary: {str(e)}")
+
+@api_router.get("/salary/working-days/{year}/{month}")
+async def get_working_days(year: int, month: int, current_user: dict = Depends(verify_token)):
+    """Get working days for a specific month"""
+    try:
+        calculator = SalaryCalculator()
+        working_days = calculator.get_working_days_in_month(year, month)
+        
+        return {
+            "year": year,
+            "month": month,
+            "working_days": working_days,
+            "month_name": datetime(year, month, 1).strftime('%B')
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calculating working days: {str(e)}")
+
+@api_router.get("/employees/{employee_id}/attendance-summary/{year}/{month}")
+async def get_employee_attendance_summary(
+    employee_id: str, 
+    year: int, 
+    month: int,
+    current_user: dict = Depends(verify_token)
+):
+    """Get attendance summary for employee for a specific month"""
+    
+    try:
+        # Get attendance records for the month
+        attendance_records = await db.attendance.find({"employee_id": employee_id}).to_list(1000)
+        
+        # Count present days
+        present_days = get_employee_attendance_days(attendance_records, year, month)
+        
+        # Get working days
+        calculator = SalaryCalculator()
+        total_working_days = calculator.get_working_days_in_month(year, month)
+        
+        # Calculate attendance percentage
+        attendance_percentage = (present_days / total_working_days * 100) if total_working_days > 0 else 0
+        
+        return {
+            "employee_id": employee_id,
+            "year": year,
+            "month": month,
+            "month_name": datetime(year, month, 1).strftime('%B'),
+            "present_days": present_days,
+            "total_working_days": total_working_days,
+            "absent_days": total_working_days - present_days,
+            "attendance_percentage": round(attendance_percentage, 2)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting attendance summary: {str(e)}")
+
+@api_router.get("/salary/rates")
+async def get_salary_rates(current_user: dict = Depends(verify_token)):
+    """Get current government salary calculation rates"""
+    
+    return {
+        "government_rates": {
+            "esi": {
+                "rate": "1.75%",
+                "wage_limit": 21000,
+                "description": "Employee State Insurance - applicable if gross salary ≤ ₹21,000"
+            },
+            "pf": {
+                "employee_rate": "12%",
+                "employer_rate": "12%", 
+                "wage_limit": 15000,
+                "description": "Provident Fund - calculated on basic salary, max ₹15,000"
+            },
+            "professional_tax": {
+                "rates": [
+                    {"range": "≤ ₹10,000", "amount": "₹0"},
+                    {"range": "₹10,001 - ₹15,000", "amount": "₹150"},
+                    {"range": "₹15,001 - ₹25,000", "amount": "₹200"},
+                    {"range": "> ₹25,000", "amount": "₹200"}
+                ],
+                "state": "Karnataka"
+            }
+        },
+        "allowance_rates": {
+            "hra": {
+                "metro": "50% of basic salary",
+                "non_metro": "40% of basic salary"
+            },
+            "da": "10% of basic salary",
+            "medical": "₹1,250 per month",
+            "transport": "₹1,600 per month"
+        }
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
