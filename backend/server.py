@@ -157,7 +157,7 @@ async def login(login_data: LoginRequest):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Verify password
-    if not pwd_context.verify(login_data.password, employee_data["password_hash"]):
+    if not verify_password(login_data.password, employee_data["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Create access token
