@@ -56,7 +56,7 @@ def generate_salary_slip_content(salary_calculation):
     attendance_table = Table(attendance_data, colWidths=[1.5*inch, 1.5*inch, 1.5*inch, 1.5*inch])
     attendance_table.setStyle(get_professional_table_style())
     
-    story.append(Paragraph('<b>Attendance Details</b>', styles['Heading3']))
+    story.append(Paragraph('<b>Attendance Details</b>', styles['SectionHeader']))
     story.append(attendance_table)
     story.append(Spacer(1, 20))
     
