@@ -99,14 +99,14 @@ def generate_offer_letter_content(employee_data):
     
     story.append(signature_table)
     
-    # Build PDF
-    doc.build(story)
+    # Professional footer
+    story.extend(create_professional_footer(styles))
     
-    # Get PDF data and encode to base64
-    pdf_data = buffer.getvalue()
-    buffer.close()
-    
-    return base64.b64encode(pdf_data).decode()
+    return story
+
+def generate_offer_letter(employee_data):
+    """Generate professional offer letter with logo and watermark"""
+    return create_watermarked_document(generate_offer_letter_content, employee_data)
 
 def generate_appointment_letter(employee_data):
     """Generate appointment letter PDF for employee"""
