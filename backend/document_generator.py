@@ -164,7 +164,7 @@ def generate_appointment_letter(employee_data):
     
     # Appointment content
     appointment_content = f'''
-    We are pleased to confirm your appointment as <b>{employee_data["designation"]}</b> in the <b>{employee_data["department"]}</b> department at Vishwas World Tech Private Limited, effective from {datetime.fromisoformat(employee_data["join_date"].replace('Z', '+00:00')).strftime('%B %d, %Y')}.
+    We are pleased to confirm your appointment as <b>{employee_data["designation"]}</b> in the <b>{employee_data["department"]}</b> department at Vishwas World Tech Private Limited, effective from {datetime.fromisoformat(employee_data["join_date"].replace('Z', '+00:00')).strftime('%B %d, %Y') if isinstance(employee_data["join_date"], str) else employee_data["join_date"].strftime('%B %d, %Y')}.
     <br/><br/>
     <b>Employment Details:</b><br/>
     • Employee ID: {employee_data["employee_id"]}<br/>
