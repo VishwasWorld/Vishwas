@@ -606,6 +606,278 @@ async def generate_employee_salary_slip(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating salary slip: {str(e)}")
 
+# Enhanced Employee Management Routes
+@api_router.delete("/employees/{employee_id}")
+async def delete_employee(employee_id: str, current_user: dict = Depends(verify_token)):
+    """Delete employee and related data"""
+    try:
+        # Check if employee exists
+        employee = await db.employees.find_one({"employee_id": employee_id})
+        if not employee:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        # Delete employee from database
+        await db.employees.delete_one({"employee_id": employee_id})
+        
+        # Delete related attendance records (optional - keep for audit trail)
+        # await db.attendance.delete_many({"employee_id": employee_id})
+        
+        # Delete related documents (optional - keep for audit trail)  
+        # await db.employee_documents.delete_many({"employee_id": employee_id})
+        
+        return {
+            "message": f"Employee {employee_data['full_name']} (ID: {employee_id}) deleted successfully",
+            "deleted_employee": {
+                "employee_id": employee_id,
+                "full_name": employee.get("full_name", "Unknown"),
+                "department": employee.get("department", "Unknown")
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting employee: {str(e)}")
+
+# Document Management Routes
+@api_router.post("/employees/{employee_id}/upload-document")
+async def upload_employee_document(
+    employee_id: str,
+    document_type: str,
+    description: str = "",
+    file: UploadFile = File(...),
+    current_user: dict = Depends(verify_token)
+):
+    """Upload document for employee"""
+    try:
+        # Verify employee exists
+        employee = await db.employees.find_one({"employee_id": employee_id})
+        if not employee:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        # Validate file type
+        allowed_extensions = {'.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'}
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        if file_extension not in allowed_extensions:
+            raise HTTPException(status_code=400, detail="File type not allowed")
+        
+        # Save file
+        file_path, file_size = save_uploaded_file(file, employee_id, document_type)
+        
+        # Create document record
+        document = EmployeeDocument(
+            employee_id=employee_id,
+            document_type=document_type,
+            document_name=file.filename,
+            file_path=file_path,
+            file_size=file_size,
+            uploaded_by=current_user.get("username", "system"),
+            description=description
+        )
+        
+        # Prepare for MongoDB
+        document_mongo = prepare_for_mongo(document.dict())
+        
+        # Insert into database
+        await db.employee_documents.insert_one(document_mongo)
+        
+        return {
+            "message": "Document uploaded successfully",
+            "document": EmployeeDocumentResponse(
+                id=document.id,
+                employee_id=document.employee_id,
+                document_type=document.document_type,
+                document_name=document.document_name,
+                file_size=document.file_size,
+                uploaded_by=document.uploaded_by,
+                uploaded_at=document.uploaded_at,
+                description=document.description
+            )
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading document: {str(e)}")
+
+@api_router.get("/employees/{employee_id}/documents", response_model=List[EmployeeDocumentResponse])
+async def get_employee_documents(employee_id: str, current_user: dict = Depends(verify_token)):
+    """Get all documents for an employee"""
+    try:
+        documents = await db.employee_documents.find({"employee_id": employee_id}).to_list(1000)
+        
+        result = []
+        for doc in documents:
+            doc.pop("_id", None)
+            doc.pop("file_path", None)  # Don't expose file path
+            doc = parse_from_mongo(doc)
+            result.append(EmployeeDocumentResponse(**doc))
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching employee documents: {str(e)}")
+
+@api_router.get("/employees/{employee_id}/documents/{document_id}/download")
+async def download_employee_document(
+    employee_id: str, 
+    document_id: str, 
+    current_user: dict = Depends(verify_token)
+):
+    """Download employee document"""
+    try:
+        # Find document
+        document = await db.employee_documents.find_one({
+            "id": document_id,
+            "employee_id": employee_id
+        })
+        
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+        
+        # Get file content as base64
+        file_base64 = get_file_as_base64(document["file_path"])
+        
+        return {
+            "document_name": document["document_name"],
+            "document_type": document["document_type"],
+            "file_data": file_base64,
+            "file_size": document["file_size"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error downloading document: {str(e)}")
+
+# Company Announcements Routes
+@api_router.post("/announcements", response_model=AnnouncementResponse)
+async def create_announcement(
+    announcement_data: AnnouncementCreate,
+    current_user: dict = Depends(verify_token)
+):
+    """Create company announcement"""
+    try:
+        announcement = CompanyAnnouncement(
+            title=announcement_data.title,
+            content=announcement_data.content,
+            announcement_type=announcement_data.announcement_type,
+            priority=announcement_data.priority,
+            published_by=current_user.get("username", "system"),
+            valid_until=announcement_data.valid_until,
+            target_departments=announcement_data.target_departments
+        )
+        
+        # Prepare for MongoDB
+        announcement_mongo = prepare_for_mongo(announcement.dict())
+        
+        # Insert into database
+        await db.announcements.insert_one(announcement_mongo)
+        
+        # Remove MongoDB fields for response
+        announcement_dict = announcement.dict()
+        return AnnouncementResponse(**announcement_dict)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating announcement: {str(e)}")
+
+@api_router.get("/announcements", response_model=List[AnnouncementResponse])
+async def get_announcements(current_user: dict = Depends(verify_token)):
+    """Get all active announcements"""
+    try:
+        # Get active announcements, sorted by priority and date
+        announcements = await db.announcements.find({
+            "is_active": True,
+            "$or": [
+                {"valid_until": {"$gt": datetime.now(timezone.utc)}},
+                {"valid_until": None}
+            ]
+        }).sort([("priority", -1), ("published_at", -1)]).to_list(100)
+        
+        result = []
+        for ann in announcements:
+            ann.pop("_id", None)
+            ann = parse_from_mongo(ann)
+            result.append(AnnouncementResponse(**ann))
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching announcements: {str(e)}")
+
+@api_router.delete("/announcements/{announcement_id}")
+async def delete_announcement(announcement_id: str, current_user: dict = Depends(verify_token)):
+    """Delete announcement"""
+    try:
+        # Soft delete (set inactive)
+        result = await db.announcements.update_one(
+            {"id": announcement_id},
+            {"$set": {"is_active": False}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Announcement not found")
+        
+        return {"message": "Announcement deleted successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting announcement: {str(e)}")
+
+# Enhanced Dashboard Routes
+@api_router.get("/dashboard/theme")
+async def get_dashboard_theme_config():
+    """Get dashboard theme configuration"""
+    return get_dashboard_theme()
+
+@api_router.get("/dashboard/enhanced-stats")
+async def get_enhanced_dashboard_statistics(current_user: dict = Depends(verify_token)):
+    """Get comprehensive dashboard statistics"""
+    try:
+        # Get basic stats
+        total_employees = await db.employees.count_documents({"status": "Active"})
+        today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        present_today = await db.attendance.count_documents({"date": today})
+        logged_in_now = await db.attendance.count_documents({"date": today, "status": "Logged In"})
+        
+        # Get enhanced stats
+        total_documents = await db.employee_documents.count_documents({})
+        active_announcements = await db.announcements.count_documents({"is_active": True})
+        
+        # Get recent stats (last 7 days)
+        week_ago = (datetime.now(timezone.utc) - timedelta(days=7))
+        recent_documents = await db.employee_documents.count_documents({
+            "uploaded_at": {"$gte": week_ago}
+        })
+        recent_announcements = await db.announcements.count_documents({
+            "published_at": {"$gte": week_ago}
+        })
+        
+        # Get urgent announcements
+        urgent_announcements = await db.announcements.count_documents({
+            "is_active": True,
+            "priority": "Urgent"
+        })
+        
+        return {
+            "employee_metrics": {
+                "total_employees": total_employees,
+                "present_today": present_today,
+                "logged_in_now": logged_in_now,
+                "absent_today": total_employees - present_today
+            },
+            "document_metrics": {
+                "total_documents": total_documents,
+                "recent_uploads": recent_documents,
+                "pending_documents": 0  # Can be enhanced based on requirements
+            },
+            "announcement_metrics": {
+                "active_announcements": active_announcements,
+                "recent_announcements": recent_announcements,
+                "urgent_announcements": urgent_announcements
+            },
+            "system_health": {
+                "database_status": "Connected",
+                "last_updated": datetime.now(timezone.utc).isoformat()
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching enhanced dashboard stats: {str(e)}")
+
 @api_router.post("/employees/{employee_id}/generate-employee-agreement")
 async def generate_employee_agreement_document(employee_id: str, current_user: dict = Depends(verify_token)):
     """Generate comprehensive employee agreement with legal terms"""
