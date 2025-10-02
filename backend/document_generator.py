@@ -17,13 +17,10 @@ from logo_watermark_generator import (
 
 # Removed old header function - now using professional header from logo_watermark_generator
 
-def generate_offer_letter(employee_data):
-    """Generate offer letter PDF for employee"""
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
-    
-    # Create styles
-    styles = getSampleStyleSheet()
+def generate_offer_letter_content(employee_data):
+    """Generate offer letter content for watermarked document"""
+    # Get enhanced professional styles
+    styles = enhance_document_styling()
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
