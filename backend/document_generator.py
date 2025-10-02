@@ -15,17 +15,7 @@ from logo_watermark_generator import (
     get_professional_table_style
 )
 
-def create_company_header(styles):
-    """Create company letterhead"""
-    company_header = [
-        Paragraph('<b>VISHWAS WORLD TECH PRIVATE LIMITED</b>', styles['Title']),
-        Paragraph('Corporate Office: Technology Hub, Innovation District, Bangalore - 560001', styles['Normal']),
-        Paragraph('Phone: +91-80-12345678 | Email: hr@vishwasworldtech.com | Website: www.vishwasworldtech.com', styles['Normal']),
-        Spacer(1, 12),
-        Paragraph('<hr width="100%" color="blue"/>', styles['Normal']),
-        Spacer(1, 12)
-    ]
-    return company_header
+# Removed old header function - now using professional header from logo_watermark_generator
 
 def generate_offer_letter(employee_data):
     """Generate offer letter PDF for employee"""
