@@ -151,21 +151,12 @@ def generate_salary_slip_content(salary_calculation):
     ]))
     
     story.append(employer_table)
-    story.append(Spacer(1, 30))
     
-    # Footer
-    story.append(Paragraph('This is a computer-generated salary slip and does not require signature.', 
-                          ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, 
-                                       textColor=colors.grey)))
-    story.append(Paragraph('For any queries, please contact HR Department.', 
-                          ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, alignment=TA_CENTER, 
-                                       textColor=colors.grey)))
+    # Professional footer
+    story.extend(create_professional_footer(styles))
     
-    # Build PDF
-    doc.build(story)
-    
-    # Get PDF data and encode to base64
-    pdf_data = buffer.getvalue()
-    buffer.close()
-    
-    return base64.b64encode(pdf_data).decode()
+    return story
+
+def generate_salary_slip(salary_calculation):
+    """Generate professional salary slip with logo and watermark"""
+    return create_watermarked_document(generate_salary_slip_content, salary_calculation)
