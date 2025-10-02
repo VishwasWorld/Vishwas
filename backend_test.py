@@ -1155,6 +1155,8 @@ class HRMSAPITester:
         self.test_dashboard_stats()
         self.test_document_generation()
         self.test_salary_calculation()
+        self.test_employee_agreement_and_penalties()
+        self.test_company_policy()
         
         # Print summary
         self.print_summary()
