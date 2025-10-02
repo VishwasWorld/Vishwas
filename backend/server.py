@@ -549,6 +549,56 @@ async def get_salary_rates(current_user: dict = Depends(verify_token)):
         }
     }
 
+@api_router.post("/employees/{employee_id}/generate-salary-slip")
+async def generate_employee_salary_slip(
+    employee_id: str,
+    salary_request: SalaryCalculationRequest,
+    current_user: dict = Depends(verify_token)
+):
+    """Generate salary slip PDF for employee"""
+    
+    # Get employee data
+    employee = await db.employees.find_one({"employee_id": employee_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Set default year/month if not provided
+    now = datetime.now(timezone.utc)
+    year = salary_request.year or now.year
+    month = salary_request.month or now.month
+    
+    try:
+        # Get employee attendance records
+        attendance_records = await db.attendance.find({"employee_id": employee_id}).to_list(1000)
+        
+        # Remove MongoDB ObjectId and parse dates
+        for record in attendance_records:
+            record.pop("_id", None)
+            record = parse_from_mongo(record)
+        
+        # Remove sensitive data from employee
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Calculate salary
+        salary_calculation = calculate_employee_salary(employee, attendance_records, year, month)
+        
+        # Generate salary slip PDF
+        pdf_base64 = generate_salary_slip(salary_calculation)
+        
+        return {
+            "message": "Salary slip generated successfully",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "month_year": f"{salary_calculation['employee_info']['calculation_month']}",
+            "pdf_data": pdf_base64,
+            "filename": f"Salary_Slip_{employee['full_name'].replace(' ', '_')}_{year}_{month:02d}.pdf"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating salary slip: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
