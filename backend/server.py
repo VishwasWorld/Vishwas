@@ -186,7 +186,7 @@ async def create_employee(employee_data: EmployeeCreate):
         raise HTTPException(status_code=400, detail="Employee ID or username already exists")
     
     # Hash password
-    password_hash = pwd_context.hash(employee_data.password)
+    password_hash = simple_hash(employee_data.password)
     
     # Create employee object
     employee_dict = employee_data.dict()
