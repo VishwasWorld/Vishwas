@@ -626,7 +626,7 @@ async def delete_employee(employee_id: str, current_user: dict = Depends(verify_
         # await db.employee_documents.delete_many({"employee_id": employee_id})
         
         return {
-            "message": f"Employee {employee_data['full_name']} (ID: {employee_id}) deleted successfully",
+            "message": f"Employee {employee.get('full_name', 'Unknown')} (ID: {employee_id}) deleted successfully",
             "deleted_employee": {
                 "employee_id": employee_id,
                 "full_name": employee.get("full_name", "Unknown"),
