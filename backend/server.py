@@ -599,16 +599,21 @@ async def generate_employee_salary_slip(
         # Calculate salary
         salary_calculation = calculate_employee_salary(employee, attendance_records, year, month)
         
-        # Generate salary slip PDF
-        pdf_base64 = generate_salary_slip(salary_calculation)
+        # Generate standard format salary slip PDF with digital signature
+        pdf_base64 = generate_standard_salary_slip(salary_calculation)
+        
+        # Add digital signature information
+        digital_signature = create_digital_signature_info()
         
         return {
-            "message": "Salary slip generated successfully",
+            "message": "Standard salary slip generated successfully with digital signature",
             "employee_id": employee_id,
             "employee_name": employee["full_name"],
             "month_year": f"{salary_calculation['employee_info']['calculation_month']}",
             "pdf_data": pdf_base64,
-            "filename": f"Salary_Slip_{employee['full_name'].replace(' ', '_')}_{year}_{month:02d}.pdf"
+            "filename": f"Salary_Slip_{employee['full_name'].replace(' ', '_')}_{year}_{month:02d}.pdf",
+            "digital_signature": digital_signature,
+            "format": "Standard Indian Salary Slip Format"
         }
         
     except Exception as e:
