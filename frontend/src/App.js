@@ -2,6 +2,9 @@ import React, { useState, useEffect, createContext, useContext } from "react";
 import "./App.css";
 import axios from "axios";
 import ProfessionalHeader from "./components/ProfessionalHeader";
+import EnhancedDashboard from "./components/EnhancedDashboard";
+import DocumentManagement from "./components/DocumentManagement";
+import AnnouncementManagement from "./components/AnnouncementManagement";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
