@@ -151,6 +151,11 @@ class LoginResponse(BaseModel):
     access_token: str
     employee: EmployeeResponse
 
+class SalaryCalculationRequest(BaseModel):
+    employee_id: str
+    year: int = None
+    month: int = None
+
 # Authentication Routes
 @api_router.post("/auth/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest):
