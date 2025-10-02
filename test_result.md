@@ -234,10 +234,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Employee Management API"
-    - "Authentication System"
-    - "Attendance Tracking API"
-    - "Dashboard Statistics API"
+    - "Document Generation API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
