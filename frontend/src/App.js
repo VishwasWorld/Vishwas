@@ -887,7 +887,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-2">
                 <button
                   onClick={() => setShowAddEmployee(true)}
-                  className="flex items-center justify-center space-x-2 bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+                  className="flex items-center justify-center space-x-1 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -898,7 +898,7 @@ const Dashboard = () => {
                 <button
                   onClick={() => handleAttendance('login', user?.employee_id)}
                   disabled={isLoggedInToday(user?.employee_id) || !location}
-                  className="flex items-center justify-center space-x-2 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center space-x-1 bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -909,7 +909,7 @@ const Dashboard = () => {
                 <button
                   onClick={() => handleAttendance('logout', user?.employee_id)}
                   disabled={!isLoggedInToday(user?.employee_id) || !location}
-                  className="flex items-center justify-center space-x-2 bg-orange-600 text-white p-3 rounded-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center space-x-1 bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -919,7 +919,7 @@ const Dashboard = () => {
                 
                 <button
                   onClick={() => generateDocument(user?.employee_id, 'offer')}
-                  className="flex items-center justify-center space-x-2 bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition"
+                  className="flex items-center justify-center space-x-1 bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -929,7 +929,7 @@ const Dashboard = () => {
                 
                 <button
                   onClick={() => generateDocument(user?.employee_id, 'appointment')}
-                  className="flex items-center justify-center space-x-2 bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition"
+                  className="flex items-center justify-center space-x-1 bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
