@@ -179,7 +179,7 @@ def generate_appointment_letter_content(employee_data):
     We welcome you to the Vishwas World Tech family and look forward to your valuable contribution to our organization's growth and success.
     '''
     
-    story.append(Paragraph(appointment_content, styles['Normal']))
+    story.append(Paragraph(appointment_content, styles['ProfessionalBody']))
     story.append(Spacer(1, 24))
     
     # Signature section
