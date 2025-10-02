@@ -54,12 +54,13 @@ const useAuth = () => {
   return context;
 };
 
-// Login Component
+// Professional Login Component with Logo
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
+  const logoUrl = "https://customer-assets.emergentagent.com/job_vishwas-hrms/artifacts/o6uun6ue_IMG-20251002-WA0067.jpg";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -77,16 +78,38 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 flex items-center justify-center p-4">
+      {/* Background Logo Watermark */}
+      <div className="absolute inset-0 opacity-5 flex items-center justify-center">
+        <img 
+          src={logoUrl} 
+          alt="Background Logo"
+          className="w-96 h-96 object-contain"
+        />
+      </div>
+      
+      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10 relative z-10">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
+          {/* Company Logo */}
+          <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <img 
+              src={logoUrl} 
+              alt="Vishwas World Tech Logo"
+              className="w-20 h-20 object-contain rounded-full"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+            <div className="w-20 h-20 bg-blue-600 rounded-full hidden items-center justify-center">
+              <span className="text-white font-bold text-2xl">VWT</span>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Vishwas World Tech</h1>
-          <p className="text-gray-600 mt-2">HRMS Login Portal</p>
+          
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Vishwas World Tech</h1>
+          <h2 className="text-xl font-semibold text-blue-600 mb-1">Private Limited</h2>
+          <p className="text-gray-600 mb-2">Human Resource Management System</p>
+          <p className="text-sm text-gray-500">100 DC Complex, Chandra Layout, Bangalore - 560040</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
