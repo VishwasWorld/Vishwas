@@ -234,7 +234,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Document Generation with Logo & Watermark"
+    - "Employee Deletion API"
+    - "Document Management System"
+    - "Company Announcements System"
+    - "Enhanced Dashboard Features"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
