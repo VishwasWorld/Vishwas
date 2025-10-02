@@ -125,8 +125,8 @@ def generate_appointment_letter_content(employee_data):
     # Build document content
     story = []
     
-    # Company header
-    story.extend(create_company_header(styles))
+    # Professional company header with logo
+    story.extend(create_professional_header_with_logo(styles))
     
     # Date
     current_date = datetime.now(timezone.utc).strftime('%B %d, %Y')
