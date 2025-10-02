@@ -24,13 +24,8 @@ def generate_salary_slip_content(salary_calculation):
     # Build document content
     story = []
     
-    # Company header
-    story.append(Paragraph('<b>VISHWAS WORLD TECH PRIVATE LIMITED</b>', title_style))
-    story.append(Paragraph('Corporate Office: Technology Hub, Innovation District, Bangalore - 560001', styles['Normal']))
-    story.append(Paragraph('Phone: +91-80-12345678 | Email: hr@vishwasworldtech.com', styles['Normal']))
-    story.append(Spacer(1, 20))
-    story.append(Paragraph('<hr width="100%" color="blue"/>', styles['Normal']))
-    story.append(Spacer(1, 20))
+    # Professional company header with logo
+    story.extend(create_professional_header_with_logo(styles))
     
     # Salary slip title
     story.append(Paragraph('<b>SALARY SLIP</b>', header_style))
