@@ -209,7 +209,7 @@ class HRMSAPITester:
         headers = self.get_auth_headers()
         
         # Use admin employee ID for testing
-        test_employee_id = "ADMIN001"  # Assuming admin has this ID
+        test_employee_id = "VWT001"  # Admin employee ID from database
         
         # Test 1: Employee login
         try:
