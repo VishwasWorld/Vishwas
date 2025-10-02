@@ -166,6 +166,12 @@ class SalaryCalculationRequest(BaseModel):
     year: int = None
     month: int = None
 
+class SalarySlipShareRequest(BaseModel):
+    employee_id: str
+    year: int = None
+    month: int = None
+    channels: List[str] = ["email", "whatsapp", "sms"]  # Default all channels
+
 # Authentication Routes
 @api_router.post("/auth/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest):
