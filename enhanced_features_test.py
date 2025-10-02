@@ -215,13 +215,13 @@ class EnhancedHRMSAPITester:
             files = {
                 'file': ('test_document.txt', io.BytesIO(test_file_content), 'text/plain')
             }
-            data = {
+            params = {
                 'document_type': 'Resume',
                 'description': 'Test document upload for employee'
             }
             
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/upload-document", 
-                                   files=files, data=data, headers=headers)
+                                   files=files, params=params, headers=headers)
             
             if response.status_code == 200:
                 upload_data = response.json()
