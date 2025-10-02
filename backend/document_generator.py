@@ -7,6 +7,13 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from datetime import datetime, timezone
 import io
 import base64
+from logo_watermark_generator import (
+    create_watermarked_document, 
+    create_professional_header_with_logo, 
+    create_professional_footer,
+    enhance_document_styling,
+    get_professional_table_style
+)
 
 def create_company_header(styles):
     """Create company letterhead"""
