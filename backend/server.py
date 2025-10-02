@@ -202,8 +202,9 @@ async def create_employee(employee_data: EmployeeCreate):
     result = await db.employees.insert_one(employee_mongo)
     
     # Return employee data without password hash
-    employee_dict.pop("password_hash")
-    return EmployeeResponse(**employee_dict)
+    employee_response_dict = employee.dict()
+    employee_response_dict.pop("password_hash")
+    return EmployeeResponse(**employee_response_dict)
 
 @api_router.get("/employees", response_model=List[EmployeeResponse])
 async def get_employees(current_user: dict = Depends(verify_token)):
