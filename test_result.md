@@ -234,7 +234,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Document Generation API"
+    - "Employee Agreement Generation API"
+    - "Late Login Penalty Calculation API"
+    - "Company Policy API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
