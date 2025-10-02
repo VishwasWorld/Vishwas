@@ -345,6 +345,160 @@ class HRMSAPITester:
         except Exception as e:
             self.log_result("dashboard", "Dashboard Statistics", False, f"Exception: {str(e)}")
             
+    def test_document_generation(self):
+        """Test document generation endpoints"""
+        print("\n=== TESTING DOCUMENT GENERATION API ===")
+        
+        if not self.auth_token:
+            self.log_result("documents", "Document Tests", False, "No auth token available")
+            return
+            
+        headers = self.get_auth_headers()
+        
+        # Use admin employee ID for testing
+        test_employee_id = "VWT001"  # Admin employee ID from database
+        
+        # Test 1: Generate offer letter for admin user
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-offer-letter", 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["message", "document_type", "employee_id", "employee_name", "pdf_data", "filename"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify document type
+                    if data["document_type"] == "offer_letter":
+                        # Verify PDF data is base64 encoded
+                        try:
+                            import base64
+                            base64.b64decode(data["pdf_data"])
+                            pdf_valid = True
+                        except:
+                            pdf_valid = False
+                            
+                        if pdf_valid and data["employee_id"] == test_employee_id:
+                            self.log_result("documents", "Generate Offer Letter", True, 
+                                          f"Successfully generated offer letter for {data['employee_name']}, "
+                                          f"filename: {data['filename']}, PDF size: {len(data['pdf_data'])} chars")
+                        else:
+                            self.log_result("documents", "Generate Offer Letter", False, 
+                                          f"Invalid PDF data or employee ID mismatch")
+                    else:
+                        self.log_result("documents", "Generate Offer Letter", False, 
+                                      f"Wrong document type: {data['document_type']}")
+                else:
+                    missing_fields = [field for field in required_fields if field not in data]
+                    self.log_result("documents", "Generate Offer Letter", False, 
+                                  f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("documents", "Generate Offer Letter", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("documents", "Generate Offer Letter", False, f"Exception: {str(e)}")
+            
+        # Test 2: Generate appointment letter for admin user
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-appointment-letter", 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["message", "document_type", "employee_id", "employee_name", "pdf_data", "filename"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify document type
+                    if data["document_type"] == "appointment_letter":
+                        # Verify PDF data is base64 encoded
+                        try:
+                            import base64
+                            base64.b64decode(data["pdf_data"])
+                            pdf_valid = True
+                        except:
+                            pdf_valid = False
+                            
+                        if pdf_valid and data["employee_id"] == test_employee_id:
+                            self.log_result("documents", "Generate Appointment Letter", True, 
+                                          f"Successfully generated appointment letter for {data['employee_name']}, "
+                                          f"filename: {data['filename']}, PDF size: {len(data['pdf_data'])} chars")
+                        else:
+                            self.log_result("documents", "Generate Appointment Letter", False, 
+                                          f"Invalid PDF data or employee ID mismatch")
+                    else:
+                        self.log_result("documents", "Generate Appointment Letter", False, 
+                                      f"Wrong document type: {data['document_type']}")
+                else:
+                    missing_fields = [field for field in required_fields if field not in required_fields]
+                    self.log_result("documents", "Generate Appointment Letter", False, 
+                                  f"Missing fields: {missing_fields}")
+            else:
+                self.log_result("documents", "Generate Appointment Letter", False, 
+                              f"HTTP {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_result("documents", "Generate Appointment Letter", False, f"Exception: {str(e)}")
+            
+        # Test 3: Test with invalid employee ID
+        try:
+            invalid_employee_id = "INVALID123"
+            response = requests.post(f"{self.base_url}/employees/{invalid_employee_id}/generate-offer-letter", 
+                                   headers=headers)
+            
+            if response.status_code == 404:
+                self.log_result("documents", "Invalid Employee ID Error Handling", True, 
+                              "Correctly returned 404 for invalid employee ID")
+            else:
+                self.log_result("documents", "Invalid Employee ID Error Handling", False, 
+                              f"Expected 404, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("documents", "Invalid Employee ID Error Handling", False, f"Exception: {str(e)}")
+            
+        # Test 4: Test authentication requirement for document endpoints
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-offer-letter")  # No auth header
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("documents", "Document Auth Required", True, 
+                              "Correctly requires authentication for document generation")
+            else:
+                self.log_result("documents", "Document Auth Required", False, 
+                              f"Expected 401/403, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("documents", "Document Auth Required", False, f"Exception: {str(e)}")
+            
+        # Test 5: Verify document content includes company letterhead (by checking PDF size and structure)
+        try:
+            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/generate-offer-letter", 
+                                   headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                pdf_data = data.get("pdf_data", "")
+                
+                # A proper PDF with letterhead should be reasonably sized (>5KB base64)
+                if len(pdf_data) > 6000:  # Base64 encoded PDF should be substantial
+                    # Check filename contains company/employee info
+                    filename = data.get("filename", "")
+                    if "Offer_Letter" in filename and test_employee_id in filename:
+                        self.log_result("documents", "Document Content Verification", True, 
+                                      f"Document appears to contain proper content, size: {len(pdf_data)} chars")
+                    else:
+                        self.log_result("documents", "Document Content Verification", False, 
+                                      f"Filename format incorrect: {filename}")
+                else:
+                    self.log_result("documents", "Document Content Verification", False, 
+                                  f"PDF appears too small, may be missing content: {len(pdf_data)} chars")
+            else:
+                self.log_result("documents", "Document Content Verification", False, 
+                              f"Could not retrieve document for content verification")
+                
+        except Exception as e:
+            self.log_result("documents", "Document Content Verification", False, f"Exception: {str(e)}")
+            
     def run_all_tests(self):
         """Run all test suites"""
         print("🚀 Starting HRMS Backend API Tests")
