@@ -147,6 +147,11 @@ const Dashboard = () => {
   const [attendanceAction, setAttendanceAction] = useState(null);
   const [location, setLocation] = useState(null);
   const [locationError, setLocationError] = useState('');
+  const [showSalaryCalculator, setShowSalaryCalculator] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [salaryCalculation, setSalaryCalculation] = useState(null);
+  const [calculationMonth, setCalculationMonth] = useState(new Date().getMonth() + 1);
+  const [calculationYear, setCalculationYear] = useState(new Date().getFullYear());
 
   const [newEmployee, setNewEmployee] = useState({
     employee_id: '',
