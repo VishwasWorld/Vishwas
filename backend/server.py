@@ -319,6 +319,7 @@ async def get_employee_attendance(employee_id: str, current_user: dict = Depends
     # Parse MongoDB data
     result = []
     for record in attendance_records:
+        record.pop("_id", None)  # Remove MongoDB ObjectId
         record = parse_from_mongo(record)
         result.append(record)
     
