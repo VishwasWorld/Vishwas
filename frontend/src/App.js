@@ -1025,6 +1025,13 @@ const Dashboard = () => {
                             >
                               Calculate Salary
                             </button>
+                            <button
+                              onClick={() => generateDocument(employee.employee_id, 'agreement')}
+                              className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition"
+                              title="Generate Employee Agreement"
+                            >
+                              Agreement
+                            </button>
                           </div>
                         </td>
                       </tr>
