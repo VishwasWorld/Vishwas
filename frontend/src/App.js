@@ -277,9 +277,14 @@ const Dashboard = () => {
 
   const generateDocument = async (employeeId, documentType) => {
     try {
-      const endpoint = documentType === 'offer' ? 
-        `/employees/${employeeId}/generate-offer-letter` : 
-        `/employees/${employeeId}/generate-appointment-letter`;
+      let endpoint;
+      if (documentType === 'offer') {
+        endpoint = `/employees/${employeeId}/generate-offer-letter`;
+      } else if (documentType === 'appointment') {
+        endpoint = `/employees/${employeeId}/generate-appointment-letter`;
+      } else if (documentType === 'agreement') {
+        endpoint = `/employees/${employeeId}/generate-employee-agreement`;
+      }
       
       const response = await axios.post(`${API}${endpoint}`);
       
