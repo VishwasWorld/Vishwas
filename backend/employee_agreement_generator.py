@@ -97,8 +97,8 @@ def generate_employee_agreement_content(employee_data):
     # Professional company header with logo
     story.extend(create_professional_header_with_logo(styles))
     
-    # Title
-    story.append(Paragraph('<b>EMPLOYEE AGREEMENT</b>', title_style))
+    # Title with professional styling
+    story.append(Paragraph('<b>EMPLOYEE AGREEMENT</b>', styles['CustomTitle']))
     story.append(Spacer(1, 20))
     
     # Date and employee info
