@@ -13,6 +13,10 @@ load_dotenv(ROOT_DIR / '.env')
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+def simple_hash(password):
+    import hashlib
+    return hashlib.sha256(password.encode()).hexdigest()
+
 async def create_admin_user():
     # MongoDB connection
     mongo_url = os.environ['MONGO_URL']
