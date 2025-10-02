@@ -634,6 +634,8 @@ async def delete_employee(employee_id: str, current_user: dict = Depends(verify_
             }
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting employee: {str(e)}")
 
