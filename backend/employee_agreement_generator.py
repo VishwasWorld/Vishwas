@@ -9,6 +9,13 @@ import io
 import base64
 import requests
 from PIL import Image as PILImage
+from logo_watermark_generator import (
+    create_watermarked_document, 
+    create_professional_header_with_logo, 
+    create_professional_footer,
+    enhance_document_styling,
+    get_professional_table_style
+)
 
 def download_and_process_logo():
     """Download company logo and prepare for PDF"""
