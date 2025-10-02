@@ -15,6 +15,7 @@ from passlib.context import CryptContext
 from fastapi.responses import JSONResponse
 import base64
 from document_generator import generate_offer_letter, generate_appointment_letter
+from salary_calculator import SalaryCalculator, calculate_employee_salary, get_employee_attendance_days
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
