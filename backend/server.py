@@ -600,6 +600,101 @@ async def generate_employee_salary_slip(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating salary slip: {str(e)}")
 
+@api_router.post("/employees/{employee_id}/generate-employee-agreement")
+async def generate_employee_agreement_document(employee_id: str, current_user: dict = Depends(verify_token)):
+    """Generate comprehensive employee agreement with legal terms"""
+    employee = await db.employees.find_one({"employee_id": employee_id})
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    try:
+        # Remove MongoDB ObjectId and parse dates
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Generate employee agreement PDF
+        pdf_base64 = generate_employee_agreement(employee)
+        
+        return {
+            "message": "Employee agreement generated successfully",
+            "document_type": "employee_agreement",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "pdf_data": pdf_base64,
+            "filename": f"Employee_Agreement_{employee['full_name'].replace(' ', '_')}_{employee_id}.pdf"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating employee agreement: {str(e)}")
+
+@api_router.post("/attendance/calculate-late-penalty")
+async def calculate_late_penalty(
+    employee_id: str, 
+    login_time: str, 
+    current_user: dict = Depends(verify_token)
+):
+    """Calculate penalty for late login"""
+    try:
+        penalty_info = calculate_late_login_penalty(login_time)
+        
+        return {
+            "employee_id": employee_id,
+            "login_time": login_time,
+            "scheduled_time": "09:45",
+            "penalty_amount": penalty_info["penalty"],
+            "delay_minutes": penalty_info["delay_minutes"],
+            "category": penalty_info["category"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calculating late penalty: {str(e)}")
+
+@api_router.get("/company/policy")
+async def get_company_policy(current_user: dict = Depends(verify_token)):
+    """Get company policies and information"""
+    
+    return {
+        "company_info": {
+            "name": "Vishwas World Tech Private Limited",
+            "address": "100 DC Complex, Chandra Layout, Bangalore - 560040",
+            "phone": "+91-80-12345678",
+            "email": "hr@vishwasworldtech.com",
+            "working_hours": {
+                "start_time": "09:45 AM",
+                "end_time": "06:45 PM",
+                "lunch_break": "1 hour (as designated)",
+                "working_days": "Monday to Friday"
+            }
+        },
+        "attendance_policy": {
+            "location_tracking": "Mandatory GPS-based attendance",
+            "late_login_penalties": [
+                {"range": "Up to 15 minutes", "penalty": "₹0 (Grace period)"},
+                {"range": "16-30 minutes", "penalty": "₹200 per occurrence"},
+                {"range": "31-60 minutes", "penalty": "₹500 per occurrence"},
+                {"range": "More than 60 minutes", "penalty": "₹1,000 per occurrence"},
+                {"range": "More than 3 late arrivals/month", "penalty": "Additional ₹1,500"}
+            ]
+        },
+        "salary_policy": {
+            "calculation_basis": "Attendance-based pro-rata calculation",
+            "deductions": {
+                "pf": "12% of basic salary",
+                "esi": "1.75% if gross ≤ ₹21,000",
+                "professional_tax": "₹200 (Karnataka)",
+                "late_penalties": "As per attendance policy"
+            },
+            "allowances": {
+                "hra": "50% of basic (Metro rate)",
+                "da": "10% of basic",
+                "medical": "₹1,250/month",
+                "transport": "₹1,600/month"
+            }
+        }
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
