@@ -82,39 +82,13 @@ def generate_employee_agreement_content(employee_data):
     # Get enhanced professional styles
     styles = enhance_document_styling()
     
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=18,
-        spaceAfter=20,
-        alignment=TA_CENTER,
-        textColor=colors.darkblue
-    )
-    
-    header_style = ParagraphStyle(
-        'HeaderStyle',
-        parent=styles['Heading2'],
-        fontSize=14,
-        spaceAfter=10,
-        alignment=TA_CENTER,
-        textColor=colors.darkblue
-    )
-    
-    section_style = ParagraphStyle(
-        'SectionStyle',
-        parent=styles['Heading3'],
-        fontSize=12,
-        spaceAfter=8,
-        textColor=colors.darkblue,
-        fontName='Helvetica-Bold'
-    )
-    
+    # Enhanced justify style for legal content
     justify_style = ParagraphStyle(
         'JustifyStyle',
-        parent=styles['Normal'],
+        parent=styles['ProfessionalBody'],
         alignment=TA_JUSTIFY,
-        fontSize=10,
-        spaceAfter=6
+        fontSize=11,
+        spaceAfter=8
     )
     
     # Build document content
