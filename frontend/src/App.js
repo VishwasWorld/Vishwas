@@ -906,119 +906,15 @@ const Dashboard = () => {
       {/* Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         {currentView === 'dashboard' && (
-          <div className="space-y-8">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <StatCard
-                title="Total Employees"
-                value={stats.total_employees}
-                color="border-blue-500"
-                icon={<svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>}
-              />
-              <StatCard
-                title="Present Today"
-                value={stats.present_today}
-                color="border-green-500"
-                icon={<svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-              />
-              <StatCard
-                title="Currently Online"
-                value={stats.logged_in_now}
-                color="border-yellow-500"
-                icon={<svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}
-              />
-              <StatCard
-                title="Absent Today"
-                value={stats.absent_today}
-                color="border-red-500"
-                icon={<svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-              />
-            </div>
+          <EnhancedDashboard user={user} />
+        )}
 
-            {/* Quick Actions */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-2">
-                <button
-                  onClick={() => setShowAddEmployee(true)}
-                  className="flex items-center justify-center space-x-1 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>Add Employee</span>
-                </button>
-                
-                <button
-                  onClick={() => handleAttendance('login', user?.employee_id)}
-                  disabled={isLoggedInToday(user?.employee_id) || !location}
-                  className="flex items-center justify-center space-x-1 bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                  <span>Clock In</span>
-                </button>
-                
-                <button
-                  onClick={() => handleAttendance('logout', user?.employee_id)}
-                  disabled={!isLoggedInToday(user?.employee_id) || !location}
-                  className="flex items-center justify-center space-x-1 bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  <span>Clock Out</span>
-                </button>
-                
-                <button
-                  onClick={() => generateDocument(user?.employee_id, 'offer')}
-                  className="flex items-center justify-center space-x-1 bg-purple-600 text-white p-2 rounded-lg hover:bg-purple-700 transition text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>Offer Letter</span>
-                </button>
-                
-                <button
-                  onClick={() => generateDocument(user?.employee_id, 'appointment')}
-                  className="flex items-center justify-center space-x-1 bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>Appointment Letter</span>
-                </button>
-                
-                <button
-                  onClick={() => user && openSalaryCalculator(user)}
-                  className="flex items-center justify-center space-x-1 bg-yellow-600 text-white p-2 rounded-lg hover:bg-yellow-700 transition text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                  <span>Salary Calculator</span>
-                </button>
-                
-                <button
-                  onClick={() => generateDocument(user?.employee_id, 'agreement')}
-                  className="flex items-center justify-center space-x-1 bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>Agreement</span>
-                </button>
-              </div>
-              
-              {locationError && (
-                <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-600 px-4 py-3 rounded-lg">
-                  {locationError}
-                </div>
-              )}
-            </div>
-          </div>
+        {currentView === 'documents' && (
+          <DocumentManagement currentUser={user} employees={employees} />
+        )}
+
+        {currentView === 'announcements' && (
+          <AnnouncementManagement currentUser={user} />
         )}
 
         {currentView === 'employees' && (
