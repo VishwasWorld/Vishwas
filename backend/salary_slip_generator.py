@@ -27,8 +27,8 @@ def generate_salary_slip_content(salary_calculation):
     # Professional company header with logo
     story.extend(create_professional_header_with_logo(styles))
     
-    # Salary slip title
-    story.append(Paragraph('<b>SALARY SLIP</b>', header_style))
+    # Salary slip title with professional styling
+    story.append(Paragraph('<b>SALARY SLIP</b>', styles['CustomHeading']))
     story.append(Spacer(1, 15))
     
     # Employee details table
