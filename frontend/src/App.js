@@ -197,6 +197,7 @@ const Dashboard = () => {
   const [salaryCalculation, setSalaryCalculation] = useState(null);
   const [calculationMonth, setCalculationMonth] = useState(new Date().getMonth() + 1);
   const [calculationYear, setCalculationYear] = useState(new Date().getFullYear());
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
 
   const [newEmployee, setNewEmployee] = useState({
     employee_id: '',
