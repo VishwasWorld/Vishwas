@@ -77,13 +77,10 @@ def create_company_header_with_logo(styles):
     
     return story
 
-def generate_employee_agreement(employee_data):
-    """Generate comprehensive employee agreement with legal terms"""
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
-    
-    # Create styles
-    styles = getSampleStyleSheet()
+def generate_employee_agreement_content(employee_data):
+    """Generate employee agreement content for watermarked document"""
+    # Get enhanced professional styles
+    styles = enhance_document_styling()
     
     title_style = ParagraphStyle(
         'CustomTitle',
