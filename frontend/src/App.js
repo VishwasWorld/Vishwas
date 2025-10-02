@@ -696,6 +696,24 @@ const Dashboard = () => {
                             {employee.status}
                           </span>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => generateDocument(employee.employee_id, 'offer')}
+                              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
+                              title="Generate Offer Letter"
+                            >
+                              Offer Letter
+                            </button>
+                            <button
+                              onClick={() => generateDocument(employee.employee_id, 'appointment')}
+                              className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700 transition"
+                              title="Generate Appointment Letter"
+                            >
+                              Appointment Letter
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
