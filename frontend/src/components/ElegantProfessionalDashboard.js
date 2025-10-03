@@ -25,6 +25,21 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [shareLoading, setShareLoading] = useState(false);
   const [shareResults, setShareResults] = useState(null);
+  
+  // Add employee modal states
+  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
+  const [addEmployeeLoading, setAddEmployeeLoading] = useState(false);
+  const [newEmployeeData, setNewEmployeeData] = useState({
+    full_name: '',
+    employee_id: '',
+    email_address: '',
+    contact_number: '',
+    department: '',
+    designation: '',
+    address: '',
+    basic_salary: '',
+    join_date: new Date().toISOString().split('T')[0]
+  });
 
   const logoUrl = "https://customer-assets.emergentagent.com/job_vishwas-hrms/artifacts/o6uun6ue_IMG-20251002-WA0067.jpg";
 
