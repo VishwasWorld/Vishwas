@@ -620,14 +620,14 @@ class EnhancedHRMSTester:
             
         # Test 2: Share via single channel (email only)
         try:
-            sharing_params = {
+            params = {
                 "month": current_month,
                 "year": current_year,
                 "channels": ["email"]
             }
             
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/share-salary-slip", 
-                                   params=sharing_params, headers=headers)
+                                   params=params, headers=headers)
             
             if response.status_code == 200:
                 sharing_result = response.json()
