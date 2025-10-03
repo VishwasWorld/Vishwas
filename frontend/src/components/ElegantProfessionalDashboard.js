@@ -142,16 +142,26 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
 
   const fetchDashboardData = async () => {
     try {
+      console.log('Fetching dashboard data...');
       // Fetch all required data
       const [employeesRes, statsRes] = await Promise.all([
         axios.get(`${API}/employees`),
         axios.get(`${API}/dashboard/stats`)
       ]);
       
+      console.log('Employees response:', employeesRes.data);
+      console.log('Stats response:', statsRes.data);
+      
       setEmployees(employeesRes.data);
       setDashboardStats(statsRes.data);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      console.error('Error status:', error.response?.status);
+      console.error('Error message:', error.response?.data);
+      
+      // Set empty arrays as fallback
+      setEmployees([]);
+      setDashboardStats({});
     }
   };
 
