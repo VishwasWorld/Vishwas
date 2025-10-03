@@ -228,7 +228,7 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
 
     try {
       // Validate required fields
-      const requiredFields = ['full_name', 'employee_id', 'email_address', 'contact_number', 'department', 'designation', 'basic_salary'];
+      const requiredFields = ['full_name', 'employee_id', 'email_address', 'contact_number', 'department', 'designation', 'basic_salary', 'username', 'password'];
       const missingFields = requiredFields.filter(field => {
         const value = newEmployeeData[field];
         return !value || (typeof value === 'string' && value.trim() === '');
