@@ -134,8 +134,11 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
   ];
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    // Only fetch data if user is authenticated
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
 
   const fetchDashboardData = async () => {
     try {
