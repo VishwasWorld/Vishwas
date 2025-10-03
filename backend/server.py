@@ -72,6 +72,8 @@ def prepare_for_mongo(data):
         for key, value in data.items():
             if isinstance(value, datetime):
                 data[key] = value.isoformat()
+            elif isinstance(value, date):
+                data[key] = value.isoformat()
     return data
 
 def parse_from_mongo(item):
