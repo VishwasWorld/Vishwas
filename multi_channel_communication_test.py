@@ -273,7 +273,7 @@ class MultiChannelCommunicationTester:
                     digital_signature = data.get("digital_signature", {})
                     
                     # Verify digital signature contains required information
-                    signature_fields = ["signature_id", "generated_at", "verification_url"]
+                    signature_fields = ["verification_id", "signature_date", "qr_code_url"]
                     if all(field in digital_signature for field in signature_fields):
                         # Verify PDF data is substantial (should include signature)
                         pdf_size = len(data.get("pdf_data", ""))
