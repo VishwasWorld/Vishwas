@@ -335,9 +335,10 @@ class EnhancedHRMSTester:
         
         # Test 1: Create company holiday
         try:
+            from datetime import date
             holiday_data = {
                 "holiday_name": "Company Foundation Day",
-                "holiday_date": "2025-03-15",
+                "holiday_date": date(2025, 3, 15).isoformat(),
                 "holiday_type": "Company",
                 "description": "Celebrating 10 years of Vishwas World Tech",
                 "is_mandatory": True,
