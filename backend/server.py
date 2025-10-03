@@ -1497,9 +1497,9 @@ async def share_salary_slip_multi_channel(
             "message": "Salary slip sharing completed",
             "employee_id": employee_id,
             "employee_name": employee["full_name"],
-            "month": month,
-            "year": year,
-            "channels_attempted": channels,
+            "month": request.month,
+            "year": request.year,
+            "channels_attempted": request.channels,
             "sharing_results": sharing_results,
             "overall_status": "completed"
         }
