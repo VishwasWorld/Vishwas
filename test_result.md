@@ -367,15 +367,18 @@ backend:
 
   - task: "Digital Salary Slip with QR Code Signature"
     implemented: true
-    working: "needs_testing"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "needs_testing"
           agent: "main"
           comment: "Implemented digital salary slip generation with QR code verification link. New endpoint POST /api/employees/{employee_id}/generate-digital-salary-slip creates enhanced salary slips with digital signature info and verification capabilities."
+        - working: false
+          agent: "testing"
+          comment: "❌ TESTED: Digital salary slip generation FAILING. CRITICAL ERROR: create_digital_signature_info() function signature mismatch - function defined with 0 parameters in communication_service.py but called with 3 parameters (employee_id, month, year) in server.py lines 1410 and 1455. Authentication and error handling working correctly (404 for invalid employee). REQUIRES IMMEDIATE FIX: Either update function to accept parameters or change calling code to match function signature."
 
   - task: "Multi-channel Salary Slip Sharing"
     implemented: true
