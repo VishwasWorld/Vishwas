@@ -41,7 +41,17 @@ const AnnouncementManagement = ({ currentUser }) => {
 
   useEffect(() => {
     fetchAnnouncements();
+    fetchEmployees();
   }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get(`${API}/employees`);
+      setEmployees(response.data);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
+  };
 
   const fetchAnnouncements = async () => {
     try {
