@@ -228,15 +228,18 @@ frontend:
 
   - task: "Enhanced HRMS Dashboard with 5-Tab Layout"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
         - working: true
           agent: "testing"
           comment: "✅ COMPREHENSIVE FRONTEND TESTING COMPLETE: Successfully tested complete HRMS dashboard with professional 5-tab layout. WORKING FEATURES: (1) Professional Login: Vishwas World Tech branding, company address, working hours notice, successful authentication with admin/admin123. (2) Professional Header: Company logo, HR login info, working hours banner with GPS tracking notice. (3) 5-Tab Navigation: Dashboard, Employees, Attendance, Documents, Announcements - all tabs functional with smooth navigation. (4) Dashboard: Statistics cards showing real data (5 employees, 3 present, 3 online, 3 documents), company announcements section, today's overview panel. (5) Employee Management: Complete employee table with 5 active employees, Add Employee functionality, document generation buttons (Offer, Appointment, Salary, Agreement), Delete functionality. (6) Attendance Tracking: Today's attendance table with login/logout times, status tracking, action buttons. (7) Document Management: Professional interface with employee selection and upload functionality. (8) Announcements: Company announcements system with creation capabilities. (9) Mobile Responsive: Layout adapts correctly to mobile viewport. (10) Logout: Successful logout and redirect to login page. DISCREPANCY: Review request mentioned Interview Scheduled Tab, Working Employee Database Tab, and Yearly Holiday Calendar Tab which are not implemented in current frontend. Current implementation has different but fully functional 5-tab structure with professional Vishwas World Tech branding throughout. All core HRMS functionality working perfectly."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE FOUND: Add New Employee modal functionality is BROKEN. While the blue 'Add New Employee' button is visible and clickable, the modal fails to render properly when clicked. The modal overlay appears but no form fields are displayed (Full Name, Employee ID, Email, Contact, Department dropdown, Designation, Basic Salary fields are missing). Tested with multiple click methods including force clicks - button responds but modal content doesn't load. No JavaScript errors detected in console, suggesting a React state management or component rendering issue. This prevents users from adding new employees through the UI. WORKING: Login (admin/admin123), 5-tab navigation (Employee Database, Interview Scheduled, Working Employee Database, Announcements, Yearly Holiday Calendar), employee table display, dashboard statistics, professional branding. BROKEN: Add Employee modal form rendering and functionality."
 
 metadata:
   created_by: "main_agent"
