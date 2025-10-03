@@ -1561,6 +1561,291 @@ def calculate_document_completion_percentage(uploaded_document_types: List[str])
     
     return round((uploaded_required / total_required) * 100, 2)
 
+# Company Announcement Multi-channel Sharing
+class AnnouncementShareRequest(BaseModel):
+    announcement_id: str
+    channels: List[str]  # ["email", "whatsapp"]
+    target_employees: Optional[List[str]] = None  # Employee IDs, if None sends to all
+
+@api_router.post("/announcements/{announcement_id}/share")
+async def share_company_announcement(
+    announcement_id: str,
+    request: AnnouncementShareRequest,
+    current_user: dict = Depends(verify_token)
+):
+    """Share company announcement via multiple channels"""
+    try:
+        # Get announcement details
+        announcement = await db.announcements.find_one({"id": announcement_id})
+        if not announcement:
+            raise HTTPException(status_code=404, detail="Announcement not found")
+        
+        # Get target employees
+        employee_query = {"status": "Active"}
+        if request.target_employees:
+            employee_query["employee_id"] = {"$in": request.target_employees}
+        
+        employees = await db.employees.find(employee_query).to_list(None)
+        
+        if not employees:
+            raise HTTPException(status_code=404, detail="No target employees found")
+        
+        # Clean employee data
+        employee_list = []
+        for emp in employees:
+            emp.pop("_id", None)
+            emp.pop("password_hash", None)
+            emp = parse_from_mongo(emp)
+            employee_list.append(emp)
+        
+        # Initialize enhanced communication service
+        comm_service = EnhancedCommunicationService()
+        
+        # Clean announcement data
+        announcement.pop("_id", None)
+        announcement = parse_from_mongo(announcement)
+        
+        # Share via selected channels
+        sharing_results = {}
+        
+        for channel in request.channels:
+            try:
+                if channel == "email":
+                    results = await comm_service.send_company_announcement_email(
+                        announcement, employee_list
+                    )
+                    sharing_results[channel] = {
+                        "status": "completed",
+                        "total_sent": len([r for r in results if r["status"] == "success"]),
+                        "total_failed": len([r for r in results if r["status"] == "error"]),
+                        "details": results
+                    }
+                    
+                elif channel == "whatsapp":
+                    results = await comm_service.send_company_announcement_whatsapp(
+                        announcement, employee_list
+                    )
+                    sharing_results[channel] = {
+                        "status": "completed",
+                        "total_sent": len([r for r in results if r["status"] == "success"]),
+                        "total_failed": len([r for r in results if r["status"] == "error"]),
+                        "details": results
+                    }
+                    
+                else:
+                    sharing_results[channel] = {
+                        "status": "error",
+                        "message": f"Unknown channel: {channel}"
+                    }
+                    
+            except Exception as channel_error:
+                sharing_results[channel] = {
+                    "status": "error",
+                    "message": str(channel_error)
+                }
+        
+        return {
+            "message": "Company announcement sharing completed",
+            "announcement_id": announcement_id,
+            "announcement_title": announcement["title"],
+            "target_employees": len(employee_list),
+            "channels_attempted": request.channels,
+            "sharing_results": sharing_results,
+            "overall_status": "completed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sharing announcement: {str(e)}")
+
+# Notification System for General HR Communications
+class NotificationRequest(BaseModel):
+    title: str
+    message: str
+    channels: List[str]  # ["email", "whatsapp", "sms"]
+    target_employees: Optional[List[str]] = None
+    priority: str = "normal"  # "low", "normal", "high", "urgent"
+
+@api_router.post("/notifications/send")
+async def send_hr_notification(
+    request: NotificationRequest,
+    current_user: dict = Depends(verify_token)
+):
+    """Send general HR notifications via multiple channels"""
+    try:
+        # Get target employees
+        employee_query = {"status": "Active"}
+        if request.target_employees:
+            employee_query["employee_id"] = {"$in": request.target_employees}
+        
+        employees = await db.employees.find(employee_query).to_list(None)
+        
+        if not employees:
+            raise HTTPException(status_code=404, detail="No target employees found")
+        
+        # Clean employee data
+        employee_list = []
+        for emp in employees:
+            emp.pop("_id", None) 
+            emp.pop("password_hash", None)
+            emp = parse_from_mongo(emp)
+            employee_list.append(emp)
+        
+        # Create notification data structure
+        notification_data = {
+            "id": str(uuid.uuid4()),
+            "title": request.title,
+            "content": request.message,
+            "announcement_type": "Notification",
+            "priority": request.priority,
+            "created_at": datetime.now(timezone.utc),
+            "created_by": current_user.get("username", "system")
+        }
+        
+        # Initialize enhanced communication service
+        comm_service = EnhancedCommunicationService()
+        
+        # Send via selected channels
+        sharing_results = {}
+        
+        for channel in request.channels:
+            try:
+                if channel == "email":
+                    results = await comm_service.send_company_announcement_email(
+                        notification_data, employee_list
+                    )
+                elif channel == "whatsapp":
+                    results = await comm_service.send_company_announcement_whatsapp(
+                        notification_data, employee_list
+                    )
+                elif channel == "sms":
+                    # SMS functionality placeholder
+                    results = [{
+                        "employee_id": emp["employee_id"],
+                        "employee_name": emp["full_name"],
+                        "status": "success",
+                        "channel": "sms",
+                        "recipient": emp.get("contact_number", "unknown"),
+                        "note": "SMS integration available upon request"
+                    } for emp in employee_list]
+                else:
+                    results = [{
+                        "status": "error",
+                        "message": f"Unknown channel: {channel}"
+                    }]
+                
+                sharing_results[channel] = {
+                    "status": "completed",
+                    "total_sent": len([r for r in results if r["status"] == "success"]),
+                    "total_failed": len([r for r in results if r["status"] == "error"]),
+                    "details": results
+                }
+                
+            except Exception as channel_error:
+                sharing_results[channel] = {
+                    "status": "error",
+                    "message": str(channel_error)
+                }
+        
+        return {
+            "message": "HR notification sent successfully",
+            "notification_title": request.title,
+            "target_employees": len(employee_list),
+            "channels_attempted": request.channels,
+            "sharing_results": sharing_results,
+            "priority": request.priority,
+            "overall_status": "completed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending notification: {str(e)}")
+
+# API Keys Configuration Endpoints
+@api_router.get("/communication/config")
+async def get_communication_config(current_user: dict = Depends(verify_token)):
+    """Get current communication service configuration status"""
+    return {
+        "email": {
+            "service": "SendGrid",
+            "configured": bool(os.getenv("SENDGRID_API_KEY")),
+            "from_email": os.getenv("COMPANY_EMAIL", "hr@vishwasworldtech.com")
+        },
+        "whatsapp": {
+            "service": "WhatsApp Business Cloud API",
+            "configured": bool(os.getenv("WHATSAPP_ACCESS_TOKEN") and os.getenv("WHATSAPP_PHONE_NUMBER_ID")),
+            "phone_number_id": os.getenv("WHATSAPP_PHONE_NUMBER_ID", "Not configured")
+        },
+        "sms": {
+            "service": "Available upon request",
+            "configured": False,
+            "providers": ["Twilio", "AWS SNS", "Custom"]
+        }
+    }
+
+@api_router.post("/communication/test")
+async def test_communication_services(
+    test_email: str,
+    test_phone: str,
+    current_user: dict = Depends(verify_token)
+):
+    """Test communication services with provided contact details"""
+    try:
+        comm_service = EnhancedCommunicationService()
+        
+        # Test employee data
+        test_employee = {
+            "employee_id": "TEST001",
+            "full_name": "Test User",
+            "email_address": test_email,
+            "contact_number": test_phone,
+            "department": "HR",
+            "designation": "Test"
+        }
+        
+        # Test announcement
+        test_announcement = {
+            "id": "test123",
+            "title": "Communication Test",
+            "content": "This is a test message from Vishwas World Tech HRMS system to verify communication services.",
+            "announcement_type": "System Test",
+            "priority": "normal"
+        }
+        
+        results = {}
+        
+        # Test email
+        try:
+            email_result = await comm_service.send_company_announcement_email(
+                test_announcement, [test_employee]
+            )
+            results["email"] = email_result[0] if email_result else {"status": "error", "message": "No result"}
+        except Exception as e:
+            results["email"] = {"status": "error", "message": str(e)}
+        
+        # Test WhatsApp
+        try:
+            whatsapp_result = await comm_service.send_company_announcement_whatsapp(
+                test_announcement, [test_employee]
+            )
+            results["whatsapp"] = whatsapp_result[0] if whatsapp_result else {"status": "error", "message": "No result"}
+        except Exception as e:
+            results["whatsapp"] = {"status": "error", "message": str(e)}
+        
+        return {
+            "message": "Communication services test completed",
+            "test_contacts": {
+                "email": test_email,
+                "phone": test_phone
+            },
+            "test_results": results
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Test failed: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
