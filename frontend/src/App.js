@@ -201,7 +201,7 @@ function App() {
 
   return (
     <div className="App">
-      {user ? <ElegantProfessionalDashboard /> : <LoginPage />}
+      {user ? <ElegantProfessionalDashboard user={user} logout={logout} /> : <LoginPage />}
     </div>
   );
 }
