@@ -236,10 +236,16 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
         return;
       }
 
-      // Convert basic_salary to number
+      // Convert basic_salary to number and validate
+      const salaryValue = parseFloat(newEmployeeData.basic_salary);
+      if (isNaN(salaryValue) || salaryValue <= 0) {
+        alert('Please enter a valid basic salary amount');
+        return;
+      }
+
       const employeeData = {
         ...newEmployeeData,
-        basic_salary: parseFloat(newEmployeeData.basic_salary),
+        basic_salary: salaryValue,
         status: 'Active'
       };
 
