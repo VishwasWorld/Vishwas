@@ -1129,6 +1129,393 @@ async def get_company_policy(current_user: dict = Depends(verify_token)):
         }
     }
 
+# ==============================
+# NEW ENHANCED HRMS MODULES API ENDPOINTS
+# ==============================
+
+# Interview Scheduling Routes
+@api_router.post("/interviews", response_model=InterviewCandidateResponse)
+async def create_interview(
+    interview_data: InterviewCandidateCreate,
+    current_user: dict = Depends(verify_token)
+):
+    """Schedule new interview for candidate"""
+    try:
+        interview = InterviewCandidate(
+            **interview_data.dict(),
+            created_by=current_user.get("username", "system")
+        )
+        
+        interview_mongo = prepare_for_mongo(interview.dict())
+        await db.interviews.insert_one(interview_mongo)
+        
+        interview_dict = interview.dict()
+        return InterviewCandidateResponse(**interview_dict)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating interview: {str(e)}")
+
+@api_router.get("/interviews", response_model=List[InterviewCandidateResponse])
+async def get_interviews(
+    status: str = None,
+    department: str = None,
+    current_user: dict = Depends(verify_token)
+):
+    """Get scheduled interviews with optional filters"""
+    try:
+        query = {}
+        if status:
+            query["interview_status"] = status
+        if department:
+            query["department"] = department
+        
+        interviews = await db.interviews.find(query).sort("interview_date", 1).to_list(100)
+        
+        result = []
+        for interview in interviews:
+            interview.pop("_id", None)
+            interview = parse_from_mongo(interview)
+            result.append(InterviewCandidateResponse(**interview))
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching interviews: {str(e)}")
+
+@api_router.put("/interviews/{interview_id}")
+async def update_interview_status(
+    interview_id: str,
+    status: str,
+    notes: str = "",
+    current_user: dict = Depends(verify_token)
+):
+    """Update interview status and notes"""
+    try:
+        update_data = {
+            "interview_status": status,
+            "interview_notes": notes,
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        result = await db.interviews.update_one(
+            {"id": interview_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Interview not found")
+        
+        return {"message": "Interview status updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating interview: {str(e)}")
+
+# Working Employee Database Routes
+@api_router.get("/working-employees", response_model=List[dict])
+async def get_working_employees(
+    department: str = None,
+    current_user: dict = Depends(verify_token)
+):
+    """Get detailed working employee database"""
+    try:
+        query = {"status": "Active"}
+        if department:
+            query["department"] = department
+        
+        employees = await db.employees.find(query).to_list(None)
+        
+        result = []
+        for emp in employees:
+            emp.pop("_id", None)
+            emp.pop("password_hash", None)
+            emp = parse_from_mongo(emp)
+            
+            # Get latest attendance for each employee
+            latest_attendance = await db.attendance.find_one(
+                {"employee_id": emp["employee_id"]},
+                sort=[("date", -1)]
+            )
+            
+            # Get document completion status
+            emp_documents = await db.employee_documents.find(
+                {"employee_id": emp["employee_id"]}
+            ).to_list(None)
+            
+            document_types = [doc.get("document_type", "") for doc in emp_documents]
+            completion_percentage = calculate_document_completion_percentage(document_types)
+            
+            # Enhanced employee profile
+            enhanced_employee = {
+                **emp,
+                "latest_attendance": latest_attendance,
+                "document_completion": completion_percentage,
+                "total_documents": len(emp_documents),
+                "last_login": latest_attendance.get("login_time") if latest_attendance else None
+            }
+            
+            result.append(enhanced_employee)
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching working employees: {str(e)}")
+
+@api_router.get("/working-employees/{employee_id}/attendance-report")
+async def get_employee_attendance_report(
+    employee_id: str,
+    month: int,
+    year: int,
+    current_user: dict = Depends(verify_token)
+):
+    """Get detailed attendance report for working employee"""
+    try:
+        # Get all attendance records for the employee
+        attendance_records = await db.attendance.find({
+            "employee_id": employee_id
+        }).to_list(None)
+        
+        # Convert MongoDB records to dict format
+        records = []
+        for record in attendance_records:
+            record.pop("_id", None)
+            record = parse_from_mongo(record)
+            records.append(record)
+        
+        # Generate comprehensive report
+        report = generate_employee_attendance_report(employee_id, month, year, records)
+        
+        return report
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating attendance report: {str(e)}")
+
+# Holiday Calendar Routes
+@api_router.post("/holidays", response_model=CompanyHolidayResponse)
+async def create_holiday(
+    holiday_data: CompanyHolidayCreate,
+    current_user: dict = Depends(verify_token)
+):
+    """Add company holiday to calendar"""
+    try:
+        holiday = CompanyHoliday(
+            **holiday_data.dict(),
+            created_by=current_user.get("username", "system")
+        )
+        
+        holiday_mongo = prepare_for_mongo(holiday.dict())
+        await db.holidays.insert_one(holiday_mongo)
+        
+        holiday_dict = holiday.dict()
+        return CompanyHolidayResponse(**holiday_dict)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating holiday: {str(e)}")
+
+@api_router.get("/holidays/{year}")
+async def get_yearly_holidays(
+    year: int,
+    current_user: dict = Depends(verify_token)
+):
+    """Get complete holiday calendar for a year"""
+    try:
+        # Get custom company holidays
+        custom_holidays = await db.holidays.find({
+            "$expr": {"$eq": [{"$year": "$holiday_date"}, year]}
+        }).to_list(None)
+        
+        # Get Indian national holidays
+        national_holidays = get_indian_national_holidays(year)
+        
+        # Process custom holidays
+        custom_holiday_list = []
+        for holiday in custom_holidays:
+            holiday.pop("_id", None)
+            holiday = parse_from_mongo(holiday)
+            custom_holiday_list.append(CompanyHolidayResponse(**holiday))
+        
+        # Combine all holidays
+        all_holidays = custom_holiday_list + [
+            CompanyHolidayResponse(
+                id=str(uuid.uuid4()),
+                holiday_name=h["name"],
+                holiday_date=datetime.strptime(h["date"], "%Y-%m-%d").date(),
+                holiday_type=h["type"],
+                description=f"Indian {h['type']} Holiday",
+                is_mandatory=True,
+                applicable_locations=["All"],
+                created_at=datetime.now(timezone.utc)
+            ) for h in national_holidays
+        ]
+        
+        # Sort by date
+        all_holidays.sort(key=lambda x: x.holiday_date)
+        
+        return {
+            "year": year,
+            "holidays": all_holidays,
+            "total_holidays": len(all_holidays),
+            "mandatory_holidays": len([h for h in all_holidays if h.is_mandatory]),
+            "optional_holidays": len([h for h in all_holidays if not h.is_mandatory])
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching holiday calendar: {str(e)}")
+
+# Enhanced Dashboard Overview
+@api_router.get("/dashboard/overview")
+async def get_dashboard_overview_data(current_user: dict = Depends(verify_token)):
+    """Get comprehensive dashboard overview with all modules"""
+    try:
+        overview = get_dashboard_overview()
+        
+        # Get actual statistics for each module
+        stats = {
+            "employee_database": await db.employees.count_documents({}),
+            "interview_scheduled": await db.interviews.count_documents({"interview_status": {"$ne": "Completed"}}),
+            "working_employees": await db.employees.count_documents({"status": "Active"}),
+            "announcements": await db.announcements.count_documents({"is_active": True}),
+            "holidays": await db.holidays.count_documents({})
+        }
+        
+        return {
+            **overview,
+            "statistics": stats,
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching dashboard overview: {str(e)}")
+
+# Digital Salary Slip with Signature
+@api_router.post("/employees/{employee_id}/generate-digital-salary-slip")
+async def generate_digital_salary_slip_with_signature(
+    employee_id: str,
+    month: int,
+    year: int,
+    current_user: dict = Depends(verify_token)
+):
+    """Generate salary slip with digital signature and QR code"""
+    try:
+        employee = await db.employees.find_one({"employee_id": employee_id})
+        if not employee:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Generate digital signature info
+        signature_info = create_digital_signature_info(employee_id, month, year)
+        
+        # Generate standard salary slip with digital signature
+        pdf_base64 = generate_standard_salary_slip(employee, month, year, signature_info)
+        
+        return {
+            "message": "Digital salary slip generated successfully",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "month": month,
+            "year": year,
+            "pdf_data": pdf_base64,
+            "filename": f"Digital_Salary_Slip_{employee['full_name'].replace(' ', '_')}_{month}_{year}.pdf",
+            "digital_signature": signature_info,
+            "sharing_channels": ["email", "whatsapp", "sms"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating digital salary slip: {str(e)}")
+
+# Multi-channel Salary Slip Sharing
+@api_router.post("/employees/{employee_id}/share-salary-slip")
+async def share_salary_slip_multi_channel(
+    employee_id: str,
+    month: int,
+    year: int,
+    channels: List[str],  # ["email", "whatsapp", "sms"]
+    current_user: dict = Depends(verify_token)
+):
+    """Share salary slip via multiple communication channels"""
+    try:
+        employee = await db.employees.find_one({"employee_id": employee_id})
+        if not employee:
+            raise HTTPException(status_code=404, detail="Employee not found")
+        
+        employee.pop("_id", None)
+        employee.pop("password_hash", None)
+        employee = parse_from_mongo(employee)
+        
+        # Initialize communication service
+        comm_service = CommunicationService()
+        
+        # Generate digital salary slip
+        signature_info = create_digital_signature_info(employee_id, month, year)
+        pdf_base64 = generate_standard_salary_slip(employee, month, year, signature_info)
+        
+        # Share via selected channels
+        sharing_results = {}
+        
+        for channel in channels:
+            try:
+                if channel == "email":
+                    result = await comm_service.send_salary_slip_email(
+                        employee, pdf_base64, month, year
+                    )
+                elif channel == "whatsapp":
+                    result = await comm_service.send_salary_slip_whatsapp(
+                        employee, month, year, signature_info
+                    )
+                elif channel == "sms":
+                    result = await comm_service.send_salary_slip_sms(
+                        employee, month, year
+                    )
+                else:
+                    result = {"status": "error", "message": f"Unknown channel: {channel}"}
+                
+                sharing_results[channel] = result
+                
+            except Exception as channel_error:
+                sharing_results[channel] = {
+                    "status": "error",
+                    "message": str(channel_error)
+                }
+        
+        return {
+            "message": "Salary slip sharing completed",
+            "employee_id": employee_id,
+            "employee_name": employee["full_name"],
+            "month": month,
+            "year": year,
+            "channels_attempted": channels,
+            "sharing_results": sharing_results,
+            "overall_status": "completed"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sharing salary slip: {str(e)}")
+
+# Helper function for document completion calculation
+def calculate_document_completion_percentage(uploaded_document_types: List[str]) -> float:
+    """Calculate document completion percentage for working employees"""
+    total_required = 0
+    uploaded_required = 0
+    
+    for category, details in WORKING_EMPLOYEE_DOCUMENT_CATEGORIES.items():
+        total_required += len(details["required"])
+        for doc_type in details["required"]:
+            if doc_type in uploaded_document_types:
+                uploaded_required += 1
+    
+    if total_required == 0:
+        return 100.0
+    
+    return round((uploaded_required / total_required) * 100, 2)
+
 # Include the router in the main app
 app.include_router(api_router)
 
