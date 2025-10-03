@@ -674,14 +674,14 @@ class EnhancedHRMSTester:
         # Test 4: Test with invalid employee ID
         try:
             invalid_employee_id = "INVALID123"
-            sharing_params = {
+            params = {
                 "month": current_month,
                 "year": current_year,
                 "channels": ["email"]
             }
             
             response = requests.post(f"{self.base_url}/employees/{invalid_employee_id}/share-salary-slip", 
-                                   params=sharing_params, headers=headers)
+                                   params=params, headers=headers)
             
             if response.status_code == 404:
                 self.log_result("multi_channel", "Multi-channel Error Handling", True, 
