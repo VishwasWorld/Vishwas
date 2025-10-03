@@ -214,7 +214,11 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
   const renderTabContent = () => {
     switch (currentTab) {
       case 'employee_database':
-        return <EmployeeDatabaseTab employees={employees} />;
+        return <EmployeeDatabaseTab 
+          employees={employees} 
+          onSalarySlipShare={handleSalarySlipShare}
+          onEmployeeDocuments={handleEmployeeDocuments}
+        />;
       case 'interview_scheduled':
         return <InterviewScheduledTab />;
       case 'working_employee':
