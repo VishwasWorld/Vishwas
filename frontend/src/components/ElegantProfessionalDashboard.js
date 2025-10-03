@@ -193,6 +193,64 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
     alert(`Document management for ${employee.full_name} - Coming soon!`);
   };
 
+  // Add employee handlers
+  const handleAddEmployee = () => {
+    setShowAddEmployeeModal(true);
+    setNewEmployeeData({
+      full_name: '',
+      employee_id: '',
+      email_address: '',
+      contact_number: '',
+      department: '',
+      designation: '',
+      address: '',
+      basic_salary: '',
+      join_date: new Date().toISOString().split('T')[0]
+    });
+  };
+
+  const handleEmployeeInputChange = (field, value) => {
+    setNewEmployeeData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleAddEmployeeSubmit = async (e) => {
+    e.preventDefault();
+    setAddEmployeeLoading(true);
+
+    try {
+      // Validate required fields
+      const requiredFields = ['full_name', 'employee_id', 'email_address', 'contact_number', 'department', 'designation', 'basic_salary'];
+      const missingFields = requiredFields.filter(field => !newEmployeeData[field]);
+      
+      if (missingFields.length > 0) {
+        alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+        return;
+      }
+
+      // Convert basic_salary to number
+      const employeeData = {
+        ...newEmployeeData,
+        basic_salary: parseFloat(newEmployeeData.basic_salary),
+        status: 'Active'
+      };
+
+      const response = await axios.post(`${API}/employees`, employeeData);
+      
+      alert('Employee added successfully!');
+      setShowAddEmployeeModal(false);
+      fetchEmployees(); // Refresh employee list
+      fetchDashboardStats(); // Refresh dashboard stats
+      
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error adding employee');
+    } finally {
+      setAddEmployeeLoading(false);
+    }
+  };
+
   const handleShareChannelToggle = (channel) => {
     setShareChannels(prev => 
       prev.includes(channel) 
