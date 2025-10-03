@@ -188,7 +188,9 @@ const AnnouncementManagement = ({ currentUser }) => {
       setShareResults(response.data);
       alert('Announcement shared successfully!');
     } catch (error) {
-      alert(error.response?.data?.detail || 'Error sharing announcement');
+      const errorMessage = error.response?.data?.detail || error.message || 'Error sharing announcement';
+      alert(typeof errorMessage === 'string' ? errorMessage : 'Error sharing announcement');
+      console.error('Share announcement error:', error);
     } finally {
       setShareLoading(false);
     }
