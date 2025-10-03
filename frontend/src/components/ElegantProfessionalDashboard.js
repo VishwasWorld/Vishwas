@@ -887,7 +887,25 @@ const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan="6" className="px-6 py-12 text-center">
+                    <div className="text-gray-500">
+                      <div className="text-4xl mb-4">👥</div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No employees found</h3>
+                      <p className="text-sm text-gray-500 mb-4">
+                        {employees ? 'No employees have been added yet.' : 'Loading employees...'}
+                      </p>
+                      <button 
+                        onClick={onAddEmployee}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                      >
+                        Add First Employee
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
