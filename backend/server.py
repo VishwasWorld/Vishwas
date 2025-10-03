@@ -1477,9 +1477,27 @@ async def share_salary_slip_multi_channel(
         # Initialize communication service
         comm_service = CommunicationService()
         
-        # Generate digital salary slip
+        # Get employee attendance records for salary calculation
+        attendance_records = await db.attendance.find({
+            "employee_id": employee_id
+        }).to_list(None)
+        
+        # Clean attendance records  
+        for record in attendance_records:
+            record.pop("_id", None)
+            record = parse_from_mongo(record)
+        
+        # Calculate salary for the specified month/year
+        salary_calculation = calculate_employee_salary(employee, attendance_records, request.year, request.month)
+        
+        # Generate digital signature info
         signature_info = create_digital_signature_info(employee_id, request.month, request.year)
-        pdf_base64 = generate_standard_salary_slip(employee, request.month, request.year, signature_info)
+        
+        # Add signature info to salary calculation
+        salary_calculation["digital_signature"] = signature_info
+        
+        # Generate digital salary slip
+        pdf_base64 = generate_standard_salary_slip(salary_calculation)
         
         # Share via selected channels
         sharing_results = {}
