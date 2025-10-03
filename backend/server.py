@@ -1066,7 +1066,7 @@ async def generate_employee_agreement_document(employee_id: str, current_user: d
         raise HTTPException(status_code=500, detail=f"Error generating employee agreement: {str(e)}")
 
 @api_router.post("/attendance/calculate-late-penalty")
-async def calculate_late_penalty(
+async def calculate_employee_late_penalty(
     employee_id: str, 
     login_time: str, 
     current_user: dict = Depends(verify_token)
