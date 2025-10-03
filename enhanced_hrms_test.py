@@ -695,14 +695,14 @@ class EnhancedHRMSTester:
             
         # Test 5: Test authentication requirement
         try:
-            sharing_params = {
+            params = {
                 "month": current_month,
                 "year": current_year,
                 "channels": ["email"]
             }
             
             response = requests.post(f"{self.base_url}/employees/{test_employee_id}/share-salary-slip", 
-                                   params=sharing_params)  # No auth header
+                                   params=params)  # No auth header
             
             if response.status_code == 401 or response.status_code == 403:
                 self.log_result("multi_channel", "Multi-channel Auth Required", True, 
