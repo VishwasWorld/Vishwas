@@ -225,10 +225,14 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
     try {
       // Validate required fields
       const requiredFields = ['full_name', 'employee_id', 'email_address', 'contact_number', 'department', 'designation', 'basic_salary'];
-      const missingFields = requiredFields.filter(field => !newEmployeeData[field]);
+      const missingFields = requiredFields.filter(field => {
+        const value = newEmployeeData[field];
+        return !value || (typeof value === 'string' && value.trim() === '');
+      });
       
       if (missingFields.length > 0) {
-        alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+        const fieldNames = missingFields.join(', ');
+        alert(`Please fill in all required fields: ${fieldNames}`);
         return;
       }
 
