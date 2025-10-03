@@ -280,7 +280,7 @@ class MultiChannelCommunicationTester:
                         if pdf_size > 50000:  # Should be substantial with signature
                             self.log_result("digital_signature", "Generate Digital Salary Slip with Signature", True, 
                                           f"Successfully generated digital salary slip for {data['employee_name']} (Jan 2025) "
-                                          f"with signature ID: {digital_signature['signature_id']}, PDF size: {pdf_size} chars")
+                                          f"with verification ID: {digital_signature['verification_id']}, PDF size: {pdf_size} chars")
                         else:
                             self.log_result("digital_signature", "Generate Digital Salary Slip with Signature", False, 
                                           f"PDF size too small for digital signature: {pdf_size} chars")
