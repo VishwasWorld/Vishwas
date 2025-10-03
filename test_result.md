@@ -246,9 +246,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "New HRMS Modules Integration"
-    - "Digital Salary Slip with QR Code Signature"
-    - "Multi-channel Salary Slip Sharing"
+    - "Enhanced HRMS Dashboard with 5-Tab Layout"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
