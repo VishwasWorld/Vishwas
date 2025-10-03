@@ -182,7 +182,7 @@ const LoginPage = () => {
 
 // Main App Component
 function App() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   if (loading) {
     return (
