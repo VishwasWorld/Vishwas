@@ -291,6 +291,7 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
           employees={employees} 
           onSalarySlipShare={handleSalarySlipShare}
           onEmployeeDocuments={handleEmployeeDocuments}
+          onAddEmployee={handleAddEmployee}
         />;
       case 'interview_scheduled':
         return <InterviewScheduledTab />;
