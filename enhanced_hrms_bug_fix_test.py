@@ -13,7 +13,7 @@ import time
 BASE_URL = "https://vishwashrms.preview.emergentagent.com/api"
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
-TEST_EMPLOYEE_ID = "EMP001"  # HR Administrator
+TEST_EMPLOYEE_ID = "VWT001"  # HR Administrator
 TEST_MONTH = 1
 TEST_YEAR = 2025
 
