@@ -7,7 +7,14 @@ const API = `${BACKEND_URL}/api`;
 const AnnouncementManagement = ({ currentUser }) => {
   const [announcements, setAnnouncements] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [shareChannels, setShareChannels] = useState([]);
+  const [targetEmployees, setTargetEmployees] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareResults, setShareResults] = useState(null);
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
     content: '',
