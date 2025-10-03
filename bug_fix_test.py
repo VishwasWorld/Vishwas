@@ -253,7 +253,7 @@ class HRMSBugFixTester:
         headers = self.get_auth_headers()
         
         # Use existing employee EMP001 for testing
-        test_employee_id = "EMP001"
+        test_employee_id = "VWT001"
         current_month = datetime.now().month
         current_year = datetime.now().year
         
@@ -350,7 +350,7 @@ class HRMSBugFixTester:
         headers = self.get_auth_headers()
         
         # Use existing employee EMP001 for testing
-        test_employee_id = "EMP001"
+        test_employee_id = "VWT001"
         
         # Test 1: POST /api/employees/{employee_id}/share-salary-slip (should accept JSON body)
         try:
