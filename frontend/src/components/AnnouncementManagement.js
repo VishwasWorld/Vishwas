@@ -143,6 +143,68 @@ const AnnouncementManagement = ({ currentUser }) => {
     });
   };
 
+  const handleShareAnnouncement = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    setShareChannels([]);
+    setTargetEmployees([]);
+    setShareResults(null);
+    setShowShareModal(true);
+  };
+
+  const handleChannelToggle = (channel) => {
+    setShareChannels(prev => 
+      prev.includes(channel) 
+        ? prev.filter(c => c !== channel)
+        : [...prev, channel]
+    );
+  };
+
+  const handleEmployeeToggle = (employeeId) => {
+    setTargetEmployees(prev => 
+      prev.includes(employeeId) 
+        ? prev.filter(id => id !== employeeId)
+        : [...prev, employeeId]
+    );
+  };
+
+  const handleShareSubmit = async () => {
+    if (!selectedAnnouncement || shareChannels.length === 0) {
+      alert('Please select at least one sharing channel');
+      return;
+    }
+
+    setShareLoading(true);
+    setShareResults(null);
+
+    try {
+      const response = await axios.post(`${API}/announcements/${selectedAnnouncement.id}/share`, {
+        announcement_id: selectedAnnouncement.id,
+        channels: shareChannels,
+        target_employees: targetEmployees.length > 0 ? targetEmployees : null
+      });
+
+      setShareResults(response.data);
+      alert('Announcement shared successfully!');
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error sharing announcement');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const getShareResultsSummary = () => {
+    if (!shareResults) return null;
+
+    const totalSuccess = Object.values(shareResults.sharing_results).reduce(
+      (acc, result) => acc + (result.total_sent || 0), 0
+    );
+    const totalFailed = Object.values(shareResults.sharing_results).reduce(
+      (acc, result) => acc + (result.total_failed || 0), 0
+    );
+
+    return { totalSuccess, totalFailed };
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
