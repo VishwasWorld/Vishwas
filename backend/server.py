@@ -19,7 +19,8 @@ from salary_calculator import SalaryCalculator, calculate_employee_salary, get_e
 from salary_slip_generator import generate_salary_slip
 from standard_salary_slip_generator import generate_standard_salary_slip
 from employee_agreement_generator import generate_employee_agreement, calculate_late_login_penalty
-from communication_service import CommunicationService, create_digital_signature_info
+from communication_service import CommunicationService
+from enhanced_communication_service import EnhancedCommunicationService, create_digital_signature_info
 from enhanced_features import (
     EmployeeDocument, CompanyAnnouncement, DocumentUpload, AnnouncementCreate,
     EmployeeDocumentResponse, AnnouncementResponse, save_uploaded_file, 
