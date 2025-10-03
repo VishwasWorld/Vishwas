@@ -86,7 +86,9 @@ const AnnouncementManagement = ({ currentUser }) => {
       });
       fetchAnnouncements();
     } catch (error) {
-      alert(error.response?.data?.detail || 'Error creating announcement');
+      const errorMessage = error.response?.data?.detail || error.message || 'Error creating announcement';
+      alert(typeof errorMessage === 'string' ? errorMessage : 'Error creating announcement');
+      console.error('Create announcement error:', error);
     } finally {
       setLoading(false);
     }
