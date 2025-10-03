@@ -569,12 +569,12 @@ class EnhancedHRMSTester:
         
         # Test 1: Share salary slip via all channels
         try:
-            # The API expects individual query parameters
+            # The API expects query parameters for month, year, and channels
             url = f"{self.base_url}/employees/{test_employee_id}/share-salary-slip"
             params = {
                 "month": current_month,
                 "year": current_year,
-                "channels": "email",  # API expects individual channel parameters
+                "channels": ["email", "whatsapp", "sms"]  # List of channels
             }
             
             response = requests.post(url, params=params, headers=headers)
