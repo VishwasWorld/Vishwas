@@ -419,6 +419,7 @@ const EmployeeDatabaseTab = ({ employees }) => {
                 <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Joining Date</th>
                 <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
