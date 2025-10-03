@@ -241,8 +241,7 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
       
       alert('Employee added successfully!');
       setShowAddEmployeeModal(false);
-      fetchEmployees(); // Refresh employee list
-      fetchDashboardStats(); // Refresh dashboard stats
+      fetchDashboardData(); // Refresh employee list and dashboard stats
       
     } catch (error) {
       alert(error.response?.data?.detail || 'Error adding employee');
