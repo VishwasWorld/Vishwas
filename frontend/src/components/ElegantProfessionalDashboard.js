@@ -210,9 +210,11 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
   };
 
   const handleEmployeeInputChange = (field, value) => {
+    // Ensure value is always a string or number, not an object
+    const safeValue = typeof value === 'object' ? '' : value;
     setNewEmployeeData(prev => ({
       ...prev,
-      [field]: value
+      [field]: safeValue
     }));
   };
 
