@@ -88,7 +88,7 @@ class MultiChannelCommunicationTester:
             return
             
         headers = self.get_auth_headers()
-        test_employee_id = "EMP001"  # Using existing employee from review request
+        test_employee_id = "00001"  # Using existing employee from system
         
         # Test 1: Multi-channel salary slip sharing with all channels
         try:
@@ -258,7 +258,7 @@ class MultiChannelCommunicationTester:
             return
             
         headers = self.get_auth_headers()
-        test_employee_id = "EMP001"  # Using existing employee from review request
+        test_employee_id = "00001"  # Using existing employee from system
         
         # Test 1: Generate digital salary slip with signature
         try:
