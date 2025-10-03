@@ -246,7 +246,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced HRMS Dashboard with 5-Tab Layout"
+    - "Multi-Channel Communication Features"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
