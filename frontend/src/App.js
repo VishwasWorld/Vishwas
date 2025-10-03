@@ -201,7 +201,15 @@ function App() {
 
   return (
     <div className="App">
-      {user ? <ElegantProfessionalDashboard user={user} logout={logout} /> : <LoginPage />}
+      {user ? (
+        <div>
+          {/* Debug info */}
+          <div style={{position: 'fixed', top: 0, left: 0, background: 'red', color: 'white', padding: '5px', zIndex: 9999}}>
+            User: {user?.full_name || 'Unknown'} | Loading Dashboard...
+          </div>
+          <ElegantProfessionalDashboard user={user} logout={logout} />
+        </div>
+      ) : <LoginPage />}
     </div>
   );
 }
