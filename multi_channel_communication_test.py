@@ -687,13 +687,13 @@ class MultiChannelCommunicationTester:
             
         # Test 2: Test with specific channels only
         try:
-            request_data = {
+            params = {
                 "test_email": "test@vishwasworld.com",
-                "channels": ["email"]
+                "test_phone": "+91-9876543210"
             }
             
             response = requests.post(f"{self.base_url}/communication/test", 
-                                   json=request_data, headers=headers)
+                                   params=params, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
