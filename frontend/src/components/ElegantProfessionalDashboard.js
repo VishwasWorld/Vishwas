@@ -641,6 +641,34 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
                       placeholder="Enter complete address"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Username *
+                    </label>
+                    <input
+                      type="text"
+                      value={newEmployeeData.username}
+                      onChange={(e) => handleEmployeeInputChange('username', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                      placeholder="Enter username for login"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      value={newEmployeeData.password}
+                      onChange={(e) => handleEmployeeInputChange('password', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                      placeholder="Enter initial password"
+                      required
+                    />
+                  </div>
                 </div>
 
                 {/* Professional Information */}
