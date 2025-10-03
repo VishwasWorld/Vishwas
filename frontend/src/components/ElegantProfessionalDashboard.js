@@ -165,6 +165,52 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
     </div>
   );
 
+  // Salary slip sharing handlers
+  const handleSalarySlipShare = (employee) => {
+    setSelectedEmployee(employee);
+    setShareChannels([]);
+    setShareResults(null);
+    setShowSalaryShareModal(true);
+  };
+
+  const handleEmployeeDocuments = (employee) => {
+    // TODO: Implement employee documents modal
+    alert(`Document management for ${employee.full_name} - Coming soon!`);
+  };
+
+  const handleShareChannelToggle = (channel) => {
+    setShareChannels(prev => 
+      prev.includes(channel) 
+        ? prev.filter(c => c !== channel)
+        : [...prev, channel]
+    );
+  };
+
+  const handleSalaryShareSubmit = async () => {
+    if (!selectedEmployee || shareChannels.length === 0) {
+      alert('Please select at least one sharing channel');
+      return;
+    }
+
+    setShareLoading(true);
+    setShareResults(null);
+
+    try {
+      const response = await axios.post(`${API}/employees/${selectedEmployee.employee_id}/share-salary-slip`, {
+        month: selectedMonth,
+        year: selectedYear,
+        channels: shareChannels
+      });
+
+      setShareResults(response.data);
+      alert('Salary slip shared successfully!');
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Error sharing salary slip');
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
   const renderTabContent = () => {
     switch (currentTab) {
       case 'employee_database':
