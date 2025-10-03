@@ -646,14 +646,13 @@ class MultiChannelCommunicationTester:
         
         # Test 1: Test communication services with sample data
         try:
-            request_data = {
+            params = {
                 "test_email": "test@vishwasworld.com",
-                "test_phone": "+91-9876543210",
-                "channels": ["email", "whatsapp", "sms"]
+                "test_phone": "+91-9876543210"
             }
             
             response = requests.post(f"{self.base_url}/communication/test", 
-                                   json=request_data, headers=headers)
+                                   params=params, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
