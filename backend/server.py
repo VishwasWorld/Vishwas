@@ -82,7 +82,7 @@ def parse_from_mongo(item):
             if isinstance(value, str) and 'T' in value:
                 try:
                     item[key] = datetime.fromisoformat(value.replace('Z', '+00:00'))
-                except:
+                except ValueError:
                     pass
     return item
 
