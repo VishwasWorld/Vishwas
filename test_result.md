@@ -352,15 +352,18 @@ backend:
 
   - task: "New HRMS Modules Integration"
     implemented: true
-    working: "needs_testing"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "needs_testing"
           agent: "main"
           comment: "Integrated hrms_modules.py and working_employee_management.py into server.py. Added new API endpoints for: Interview Scheduling (POST/GET /api/interviews), Working Employee Database (GET /api/working-employees), Holiday Calendar (POST/GET /api/holidays), Digital Salary Slip with Signature (POST /api/employees/{id}/generate-digital-salary-slip), Multi-channel Sharing (POST /api/employees/{id}/share-salary-slip). Enhanced dashboard overview endpoint added."
+        - working: false
+          agent: "testing"
+          comment: "❌ TESTED: New HRMS modules partially working. CRITICAL ISSUES FOUND: (1) Interview Scheduling: ✅ POST/GET /api/interviews working, created 2 interviews successfully, but response model missing 'position' field. (2) Working Employee Database: ❌ GET /api/working-employees returns HTTP 500 due to MongoDB ObjectId serialization error. (3) Holiday Calendar: ❌ POST /api/holidays fails with date serialization error 'cannot encode object: datetime.date'. GET /api/holidays/{year} works correctly. (4) Digital Salary Slip: ❌ Both endpoints fail with 'create_digital_signature_info() takes 0 positional arguments but 3 were given' - function signature mismatch. (5) Multi-channel Sharing: ❌ All endpoints return HTTP 422 'Field required' errors - API parameter format issues. (6) Enhanced Dashboard: ✅ GET /api/dashboard/overview working perfectly with comprehensive statistics. REQUIRES IMMEDIATE FIXES for ObjectId serialization, date handling, function signatures, and API parameter formats."
 
   - task: "Digital Salary Slip with QR Code Signature"
     implemented: true
