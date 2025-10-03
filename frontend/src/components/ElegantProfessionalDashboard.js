@@ -537,7 +537,7 @@ const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleSalarySlipShare(employee)}
+                        onClick={() => onSalarySlipShare(employee)}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-1 transition"
                         title="Generate & Share Salary Slip"
                       >
@@ -545,7 +545,7 @@ const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments
                         <span>Share Salary</span>
                       </button>
                       <button
-                        onClick={() => handleEmployeeDocuments(employee)}
+                        onClick={() => onEmployeeDocuments(employee)}
                         className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-1 transition"
                         title="Employee Documents"
                       >
