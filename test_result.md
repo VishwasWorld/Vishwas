@@ -234,10 +234,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Employee Deletion API"
-    - "Document Management System"
-    - "Company Announcements System"
-    - "Enhanced Dashboard Features"
+    - "New HRMS Modules Integration"
+    - "Digital Salary Slip with QR Code Signature"
+    - "Multi-channel Salary Slip Sharing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
