@@ -382,6 +382,9 @@ backend:
         - working: false
           agent: "testing"
           comment: "❌ TESTED: Digital salary slip generation FAILING. CRITICAL ERROR: create_digital_signature_info() function signature mismatch - function defined with 0 parameters in communication_service.py but called with 3 parameters (employee_id, month, year) in server.py lines 1410 and 1455. Authentication and error handling working correctly (404 for invalid employee). REQUIRES IMMEDIATE FIX: Either update function to accept parameters or change calling code to match function signature."
+        - working: false
+          agent: "testing"
+          comment: "🔧 BUG FIX RE-TEST: Digital salary slip generation still FAILING. NEW ERROR: 'generate_standard_salary_slip() takes 1 positional argument but 4 were given' in server.py line 1420. The function is being called with (employee, month, year, signature_info) but only accepts (salary_calculation). Authentication working correctly (404 for invalid employee). REQUIRES FIX: Correct function call parameters to match function signature in standard_salary_slip_generator.py."
 
   - task: "Multi-channel Salary Slip Sharing"
     implemented: true
