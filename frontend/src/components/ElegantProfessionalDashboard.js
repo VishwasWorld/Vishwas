@@ -814,7 +814,7 @@ const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {employees.map((employee, index) => (
+              {employees && employees.length > 0 ? employees.map((employee, index) => (
                 <tr key={employee.id} className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-4">
