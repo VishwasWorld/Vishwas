@@ -106,18 +106,18 @@ class EnhancedHRMSTester:
         try:
             interview_data = {
                 "candidate_name": "Priya Sharma",
-                "candidate_email": "priya.sharma@email.com",
-                "candidate_phone": "+91-9876543210",
-                "position": "Senior Software Engineer",
+                "email": "priya.sharma@email.com",
+                "phone": "+91-9876543210",
+                "position_applied": "Senior Software Engineer",
                 "department": "Software Development",
                 "interview_type": "Technical",
                 "interview_date": (datetime.now() + timedelta(days=7)).isoformat(),
-                "interviewer": "Tech Lead",
+                "interview_time": "10:00",
+                "interviewer_name": "Tech Lead",
                 "interview_mode": "In-person",
                 "experience_years": 5,
-                "expected_salary": 120000,
-                "resume_url": "https://example.com/resume.pdf",
-                "notes": "Strong candidate with React and Node.js experience"
+                "interview_location": "Bangalore Office",
+                "interview_notes": "Strong candidate with React and Node.js experience"
             }
             
             response = requests.post(f"{self.base_url}/interviews", json=interview_data, headers=headers)
