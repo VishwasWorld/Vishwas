@@ -1238,6 +1238,11 @@ async def get_working_employees(
                 sort=[("date", -1)]
             )
             
+            # Clean attendance data if exists
+            if latest_attendance:
+                latest_attendance.pop("_id", None)
+                latest_attendance = parse_from_mongo(latest_attendance)
+            
             # Get document completion status
             emp_documents = await db.employee_documents.find(
                 {"employee_id": emp["employee_id"]}
