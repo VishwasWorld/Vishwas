@@ -592,19 +592,19 @@ class MultiChannelCommunicationTester:
             
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ["email_service", "whatsapp_service", "sms_service"]
+                required_fields = ["email", "whatsapp", "sms"]
                 
                 if all(field in data for field in required_fields):
                     # Check service configurations
-                    email_config = data.get("email_service", {})
-                    whatsapp_config = data.get("whatsapp_service", {})
-                    sms_config = data.get("sms_service", {})
+                    email_config = data.get("email", {})
+                    whatsapp_config = data.get("whatsapp", {})
+                    sms_config = data.get("sms", {})
                     
                     config_status = []
                     for service, config in [("email", email_config), ("whatsapp", whatsapp_config), ("sms", sms_config)]:
-                        status = config.get("status", "unknown")
+                        service_name = config.get("service", "unknown")
                         configured = config.get("configured", False)
-                        config_status.append(f"{service}: {status} ({'configured' if configured else 'not configured'})")
+                        config_status.append(f"{service}: {service_name} ({'configured' if configured else 'not configured'})")
                     
                     self.log_result("communication_config", "Get Communication Configuration", True, 
                                   f"Successfully retrieved communication configuration. "
