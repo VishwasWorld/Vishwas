@@ -279,7 +279,9 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
       setShareResults(response.data);
       alert('Salary slip shared successfully!');
     } catch (error) {
-      alert(error.response?.data?.detail || 'Error sharing salary slip');
+      const errorMessage = error.response?.data?.detail || error.message || 'Error sharing salary slip';
+      alert(typeof errorMessage === 'string' ? errorMessage : 'Error sharing salary slip');
+      console.error('Salary sharing error:', error);
     } finally {
       setShareLoading(false);
     }
