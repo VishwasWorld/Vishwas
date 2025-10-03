@@ -207,7 +207,9 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
       designation: '',
       address: '',
       basic_salary: '',
-      join_date: new Date().toISOString().split('T')[0]
+      join_date: new Date().toISOString().split('T')[0],
+      username: '',
+      password: ''
     });
   };
 
