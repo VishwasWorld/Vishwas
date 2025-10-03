@@ -1413,11 +1413,27 @@ async def generate_digital_salary_slip_with_signature(
         employee.pop("password_hash", None)
         employee = parse_from_mongo(employee)
         
+        # Get employee attendance records for salary calculation
+        attendance_records = await db.attendance.find({
+            "employee_id": employee_id
+        }).to_list(None)
+        
+        # Clean attendance records
+        for record in attendance_records:
+            record.pop("_id", None)
+            record = parse_from_mongo(record)
+        
+        # Calculate salary for the specified month/year
+        salary_calculation = calculate_employee_salary(employee, attendance_records, year, month)
+        
         # Generate digital signature info
         signature_info = create_digital_signature_info(employee_id, month, year)
         
+        # Add signature info to salary calculation
+        salary_calculation["digital_signature"] = signature_info
+        
         # Generate standard salary slip with digital signature
-        pdf_base64 = generate_standard_salary_slip(employee, month, year, signature_info)
+        pdf_base64 = generate_standard_salary_slip(salary_calculation)
         
         return {
             "message": "Digital salary slip generated successfully",
