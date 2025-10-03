@@ -534,8 +534,12 @@ const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Complete Employee Database</h2>
-        <button className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg">
-          + Add New Employee
+        <button 
+          onClick={handleAddEmployee}
+          className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg flex items-center space-x-2"
+        >
+          <span>+</span>
+          <span>Add New Employee</span>
         </button>
       </div>
 
