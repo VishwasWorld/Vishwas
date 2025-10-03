@@ -836,7 +836,7 @@ const HolidayCalendarTab = () => {
                     ))}
                   </div>
                   <div className="mt-3 text-sm text-gray-600">
-                    💼 Salary slip for {selectedEmployee.full_name} - {selectedMonth:02d}/{selectedYear}
+                    💼 Salary slip for {selectedEmployee.full_name} - {selectedMonth.toString().padStart(2, '0')}/{selectedYear}
                   </div>
                 </div>
               )}
