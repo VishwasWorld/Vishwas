@@ -10,7 +10,6 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const ElegantProfessionalDashboard = ({ user, logout }) => {
-  const { token } = useAuth();
   const [currentTab, setCurrentTab] = useState('employee_database');
   const [dashboardStats, setDashboardStats] = useState({});
   const [employees, setEmployees] = useState([]);
