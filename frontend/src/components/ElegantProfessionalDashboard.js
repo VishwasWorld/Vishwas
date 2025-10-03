@@ -244,7 +244,9 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
       fetchDashboardData(); // Refresh employee list and dashboard stats
       
     } catch (error) {
-      alert(error.response?.data?.detail || 'Error adding employee');
+      const errorMessage = error.response?.data?.detail || error.message || 'Error adding employee';
+      alert(typeof errorMessage === 'string' ? errorMessage : 'Error adding employee');
+      console.error('Add employee error:', error);
     } finally {
       setAddEmployeeLoading(false);
     }
