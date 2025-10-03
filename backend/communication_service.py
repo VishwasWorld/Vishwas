@@ -256,13 +256,31 @@ VISHWAS WORLD TECH: Your salary slip for {salary_calculation['employee_info']['c
         return results
 
 # Utility function
-def create_digital_signature_info() -> Dict:
-    """Create digital signature information"""
+def create_digital_signature_info(employee_id: str, month: int, year: int) -> Dict:
+    """Create digital signature information with QR code verification"""
+    import uuid
+    import hashlib
+    
+    # Generate unique verification ID
+    verification_id = str(uuid.uuid4())[:8].upper()
+    
+    # Create verification hash
+    verification_string = f"{employee_id}_{month}_{year}_{verification_id}"
+    verification_hash = hashlib.sha256(verification_string.encode()).hexdigest()[:16]
+    
+    # QR code URL for verification
+    qr_verification_url = f"https://vishwasworldtech.com/verify-salary-slip?id={verification_id}&hash={verification_hash}"
+    
     return {
         "signed_by": "Vishwas World Tech HRMS System",
         "signature_date": datetime.now().isoformat(),
-        "verification_code": f"VWT{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        "verification_id": verification_id,
+        "verification_hash": verification_hash,
+        "qr_code_url": qr_verification_url,
+        "employee_id": employee_id,
+        "salary_month": f"{month:02d}/{year}",
         "authority": "HR Department - Vishwas World Tech Pvt Ltd",
         "validity": "This document is digitally signed and valid",
-        "contact_verification": "hr@vishwasworldtech.com | +91-80-12345678"
+        "contact_verification": "hr@vishwasworldtech.com | +91-80-12345678",
+        "digital_signature_note": "Scan QR code to verify document authenticity"
     }
