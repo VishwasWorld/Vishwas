@@ -1847,7 +1847,7 @@ async def test_communication_services(
         raise HTTPException(status_code=500, detail=f"Test failed: {str(e)}")
 
 # Include the router in the main app
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
