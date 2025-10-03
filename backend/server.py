@@ -1472,15 +1472,15 @@ async def share_salary_slip_multi_channel(
             try:
                 if channel == "email":
                     result = await comm_service.send_salary_slip_email(
-                        employee, pdf_base64, month, year
+                        employee, pdf_base64, request.month, request.year
                     )
                 elif channel == "whatsapp":
                     result = await comm_service.send_salary_slip_whatsapp(
-                        employee, month, year, signature_info
+                        employee, request.month, request.year, signature_info
                     )
                 elif channel == "sms":
                     result = await comm_service.send_salary_slip_sms(
-                        employee, month, year
+                        employee, request.month, request.year
                     )
                 else:
                     result = {"status": "error", "message": f"Unknown channel: {channel}"}
