@@ -1462,13 +1462,13 @@ async def share_salary_slip_multi_channel(
         comm_service = CommunicationService()
         
         # Generate digital salary slip
-        signature_info = create_digital_signature_info(employee_id, month, year)
-        pdf_base64 = generate_standard_salary_slip(employee, month, year, signature_info)
+        signature_info = create_digital_signature_info(employee_id, request.month, request.year)
+        pdf_base64 = generate_standard_salary_slip(employee, request.month, request.year, signature_info)
         
         # Share via selected channels
         sharing_results = {}
         
-        for channel in channels:
+        for channel in request.channels:
             try:
                 if channel == "email":
                     result = await comm_service.send_salary_slip_email(
