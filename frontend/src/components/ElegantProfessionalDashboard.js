@@ -38,7 +38,9 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
     designation: '',
     address: '',
     basic_salary: '',
-    join_date: new Date().toISOString().split('T')[0]
+    join_date: new Date().toISOString().split('T')[0],
+    username: '',
+    password: ''
   });
 
   const logoUrl = "https://customer-assets.emergentagent.com/job_vishwas-hrms/artifacts/o6uun6ue_IMG-20251002-WA0067.jpg";
