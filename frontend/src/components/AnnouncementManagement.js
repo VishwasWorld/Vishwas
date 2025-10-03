@@ -464,6 +464,172 @@ const AnnouncementManagement = ({ currentUser }) => {
           </div>
         )}
       </div>
+
+      {/* Share Announcement Modal */}
+      {showShareModal && selectedAnnouncement && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  📤 Share Announcement
+                </h2>
+                <button
+                  onClick={() => setShowShareModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <h3 className="font-semibold text-blue-900">{selectedAnnouncement.title}</h3>
+                <p className="text-blue-700 text-sm mt-1">{selectedAnnouncement.content.substring(0, 100)}...</p>
+                <div className="flex items-center space-x-3 mt-2">
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {selectedAnnouncement.announcement_type}
+                  </span>
+                  <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {selectedAnnouncement.priority}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Sharing Channels */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  📡 Select Sharing Channels
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    { id: 'email', label: 'Email', icon: '📧', color: 'blue' },
+                    { id: 'whatsapp', label: 'WhatsApp', icon: '💬', color: 'green' },
+                    { id: 'sms', label: 'SMS', icon: '📱', color: 'purple' }
+                  ].map(channel => (
+                    <label key={channel.id} className="cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={shareChannels.includes(channel.id)}
+                        onChange={() => handleChannelToggle(channel.id)}
+                        className="sr-only"
+                      />
+                      <div className={`p-4 border-2 rounded-xl transition-all ${
+                        shareChannels.includes(channel.id)
+                          ? `border-${channel.color}-500 bg-${channel.color}-50`
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-2xl">{channel.icon}</span>
+                          <div>
+                            <div className="font-semibold text-gray-900">{channel.label}</div>
+                            <div className="text-sm text-gray-600">
+                              {channel.id === 'email' && 'Professional email delivery'}
+                              {channel.id === 'whatsapp' && 'Instant WhatsApp notifications'}
+                              {channel.id === 'sms' && 'SMS text messages'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Target Employees */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  👥 Select Target Employees <span className="text-sm font-normal text-gray-600 ml-2">(Leave empty to send to all active employees)</span>
+                </h3>
+                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-xl p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {employees.filter(emp => emp.status === 'Active').map(employee => (
+                      <label key={employee.employee_id} className="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg">
+                        <input
+                          type="checkbox"
+                          checked={targetEmployees.includes(employee.employee_id)}
+                          onChange={() => handleEmployeeToggle(employee.employee_id)}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-gray-900 truncate">{employee.full_name}</div>
+                          <div className="text-sm text-gray-600 truncate">
+                            {employee.employee_id} • {employee.department}
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Selected: {targetEmployees.length > 0 ? `${targetEmployees.length} employees` : 'All active employees'}
+                </div>
+              </div>
+
+              {/* Share Results */}
+              {shareResults && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <h3 className="font-semibold text-green-900 mb-3 flex items-center">
+                    ✅ Sharing Results
+                  </h3>
+                  <div className="space-y-2">
+                    {Object.entries(shareResults.sharing_results).map(([channel, result]) => (
+                      <div key={channel} className="flex items-center justify-between p-3 bg-white border border-green-100 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <span className="capitalize font-medium text-gray-900">{channel}</span>
+                          {result.status === 'completed' ? (
+                            <span className="text-green-600">✅ Completed</span>
+                          ) : (
+                            <span className="text-red-600">❌ Failed</span>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {result.total_sent || 0} sent, {result.total_failed || 0} failed
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 text-sm text-gray-600">
+                    📊 Total employees reached: {shareResults.target_employees}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex space-x-4">
+              <button
+                onClick={handleShareSubmit}
+                disabled={shareLoading || shareChannels.length === 0}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition disabled:opacity-50 font-semibold flex items-center justify-center space-x-2"
+              >
+                {shareLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <span>📤</span>
+                    <span>Share Announcement</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="flex-1 bg-gray-600 text-white py-3 rounded-xl hover:bg-gray-700 transition font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
