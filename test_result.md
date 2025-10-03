@@ -400,6 +400,9 @@ backend:
         - working: false
           agent: "testing"
           comment: "❌ TESTED: Multi-channel salary slip sharing FAILING. CRITICAL ERROR: API parameter format issues - all requests return HTTP 422 'Field required' errors. The FastAPI route expects month, year, and channels as query parameters but current implementation has parameter parsing issues. Also affected by same create_digital_signature_info() function signature error. Authentication working correctly. REQUIRES IMMEDIATE FIX: Correct FastAPI parameter handling for List[str] channels parameter and fix function signature issue."
+        - working: false
+          agent: "testing"
+          comment: "🔧 BUG FIX RE-TEST: Multi-channel sharing now accepts JSON body format correctly but still FAILING. NEW ERROR: 'generate_standard_salary_slip() takes 1 positional argument but 4 were given' in server.py line 1466. The API parameter format issue is FIXED (JSON body accepted), but same function signature error as digital salary slip. Authentication working correctly. REQUIRES FIX: Correct generate_standard_salary_slip function call parameters."
 
 agent_communication:
     - agent: "main"
