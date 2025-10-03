@@ -317,7 +317,12 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
       case 'holiday_calendar':
         return <HolidayCalendarTab />;
       default:
-        return <EmployeeDatabaseTab employees={employees} />;
+        return <EmployeeDatabaseTab 
+          employees={employees} 
+          onSalarySlipShare={handleSalarySlipShare}
+          onEmployeeDocuments={handleEmployeeDocuments}
+          onAddEmployee={handleAddEmployee}
+        />;
     }
   };
 
