@@ -25,6 +25,18 @@ from enhanced_features import (
     EmployeeDocumentResponse, AnnouncementResponse, save_uploaded_file, 
     get_file_as_base64, get_dashboard_theme, get_enhanced_dashboard_stats
 )
+from hrms_modules import (
+    InterviewCandidate, InterviewCandidateCreate, InterviewCandidateResponse,
+    WorkingEmployee, CompanyHoliday, CompanyHolidayCreate, CompanyHolidayResponse,
+    EmployeeDatabase, DashboardStats, get_indian_national_holidays, get_dashboard_overview,
+    DEPARTMENTS, DESIGNATIONS, INTERVIEW_TYPES, HOLIDAY_TYPES
+)
+from working_employee_management import (
+    EmployeeAttendanceDetail, LateLoginPenalty, MonthlyAttendanceSummary,
+    WorkingEmployeeDocument, WorkingEmployeeProfile, WorkingEmployeeDocumentUpload,
+    calculate_late_penalty, calculate_working_hours, get_attendance_status,
+    generate_employee_attendance_report, WORKING_EMPLOYEE_DOCUMENT_CATEGORIES
+)
 from fastapi import UploadFile, File
 
 ROOT_DIR = Path(__file__).parent
