@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
 import ProfessionalFooter from './ProfessionalFooter';
 import WorkingEmployeeDatabase from './WorkingEmployeeDatabase';
 import DocumentManagement from './DocumentManagement';
