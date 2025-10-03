@@ -1436,13 +1436,16 @@ async def generate_digital_salary_slip_with_signature(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating digital salary slip: {str(e)}")
 
-# Multi-channel Salary Slip Sharing
+# Multi-channel Salary Slip Sharing Request Model
+class SalarySlipShareRequest(BaseModel):
+    month: int
+    year: int
+    channels: List[str]  # ["email", "whatsapp", "sms"]
+
 @api_router.post("/employees/{employee_id}/share-salary-slip")
 async def share_salary_slip_multi_channel(
     employee_id: str,
-    month: int,
-    year: int,
-    channels: List[str],  # ["email", "whatsapp", "sms"]
+    request: SalarySlipShareRequest,
     current_user: dict = Depends(verify_token)
 ):
     """Share salary slip via multiple communication channels"""
