@@ -1153,7 +1153,7 @@ function App() {
 
   return (
     <div className="App">
-      {user ? <Dashboard /> : <LoginPage />}
+      {user ? <ElegantProfessionalDashboard /> : <LoginPage />}
     </div>
   );
 }
