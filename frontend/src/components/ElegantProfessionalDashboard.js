@@ -530,7 +530,7 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
 };
 
 // Employee Database Tab Component
-const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments }) => {
+const EmployeeDatabaseTab = ({ employees, onSalarySlipShare, onEmployeeDocuments, onAddEmployee }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
