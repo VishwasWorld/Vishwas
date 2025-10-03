@@ -1475,8 +1475,8 @@ async def share_salary_slip_multi_channel(
         employee.pop("password_hash", None)
         employee = parse_from_mongo(employee)
         
-        # Initialize communication service
-        comm_service = CommunicationService()
+        # Initialize enhanced communication service
+        comm_service = EnhancedCommunicationService()
         
         # Get employee attendance records for salary calculation
         attendance_records = await db.attendance.find({
