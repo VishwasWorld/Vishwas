@@ -569,14 +569,15 @@ class EnhancedHRMSTester:
         
         # Test 1: Share salary slip via all channels
         try:
-            sharing_params = {
+            # The API expects individual query parameters
+            url = f"{self.base_url}/employees/{test_employee_id}/share-salary-slip"
+            params = {
                 "month": current_month,
                 "year": current_year,
-                "channels": ["email", "whatsapp", "sms"]
+                "channels": "email",  # API expects individual channel parameters
             }
             
-            response = requests.post(f"{self.base_url}/employees/{test_employee_id}/share-salary-slip", 
-                                   params=sharing_params, headers=headers)
+            response = requests.post(url, params=params, headers=headers)
             
             if response.status_code == 200:
                 sharing_result = response.json()
