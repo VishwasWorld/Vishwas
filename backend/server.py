@@ -238,7 +238,7 @@ async def create_employee(employee_data: EmployeeCreate):
     employee_mongo = prepare_for_mongo(employee.dict())
     
     # Insert into database
-    result = await db.employees.insert_one(employee_mongo)
+    await db.employees.insert_one(employee_mongo)
     
     # Return employee data without password hash
     employee_response_dict = employee.dict()
