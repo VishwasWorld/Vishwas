@@ -249,8 +249,8 @@ const ElegantProfessionalDashboard = ({ user, logout }) => {
 
       const employeeData = {
         ...newEmployeeData,
-        basic_salary: salaryValue,
-        status: 'Active'
+        basic_salary: salaryValue
+        // Removed status field as it's not in the backend model
       };
 
       const response = await axios.post(`${API}/employees`, employeeData);
